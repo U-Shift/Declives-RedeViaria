@@ -26,7 +26,7 @@ Para tal, pode-se recorrer ao **QGIS** (outro software livre de Sistemas de Info
 
 O problema é que a rede viária normalmente tem de ser *limpa*. Por exemplo, faz sentido manter as escadas, os túneis e auto-estradas para caminhos em bicicleta?
 
-Para o Porto, o ficheiro `sentidos-link.shp` já foi limpo pelo Marcos Paulo (@mpschlickmann), e está disponibilizado na pasta `shapefiles`.
+Para o Porto, o ficheiro `sentidos-link.shp` já foi limpo pelo [mpschlickmann](https://github.com/mpschlickmann), e está disponibilizado na pasta `shapefiles`.
 
 ### Modelo Digital do Terreno
 
@@ -34,7 +34,7 @@ Estes raster são difíceis de obter gratuitamente para resoluções melhores. P
 
 Os dados do SRTM (*Shuttle Radar Topography Mission*), uma missão da NASA, estão [disponíveis gratuitamente](https://gisgeography.com/srtm-shuttle-radar-topography-mission/), mas para uma resolução de 25 a 30m, com erro da altimetria vertical de 16m. Para fazer donwload do *tile* correcto, pode-se também recorrer a um outro plugin do QGIS, o [SRTM-Donwloader](https://plugins.qgis.org/plugins/SRTM-Downloader/), e pedir para guardar o raster que cobre a shapefile da rede viária - é uma opção no QGIS.
 
-Como o raster (ver ficheiro `N41W009.hgt`) cobre uma área bem maior do que necessitamos, podemos sempre fazer um *clip* para ficar com dimensões mais adequadas à nossa análise: `Raster > Extraction > Clip Raster by Extent` O ficheiro `PortoNASA_clip.tif` na pasta `raster` já foi cortado para uma área mais adequada à cidade do Porto.
+Como o raster cobre uma área bem maior do que necessitamos (ver ficheiro `N41W009.hgt`), podemos sempre fazer um *clip* para ficar com dimensões mais adequadas à nossa análise: `Raster > Extraction > Clip Raster by Extent` O ficheiro `PortoNASA_clip.tif` na pasta `raster` já foi cortado para uma área mais adequada à cidade do Porto.
 
 Cálculo dos Declives
 --------------------
@@ -113,7 +113,7 @@ RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #62 segundos
 
     ## [1] FALSE
 
-Declives em percentagem: mínimo, P25, mediana, média, P75, max.
+Declives em percentagem: *mínimo, P25, mediana, média, P75, max*.
 
 ``` r
 RedeViaria$declive = RedeViaria$slope*100
@@ -189,12 +189,12 @@ mapadeclives
 
 ![](README_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
-Exportar para html
+#### Gravar em html
 
 ``` r
 tmap_save(mapadeclives, "DeclivesPorto.html", append = T)
 ```
 
-*dependendo do tamanho da rede, pode ser exigente para a RAM, só consegui exportar num pc com 16GB*
+*Dependendo do tamanho da rede, pode ser exigente para a RAM. Esta tinha cerca de 20mil arcos, e só consegui exportar num pc com 16GB*
 
 O mapa final pode ser visto online aqui: <http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html>
