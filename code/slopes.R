@@ -1,6 +1,12 @@
 #declives da rede viária do Porto
 
 #importar packages
+pkgs = c("sf", "raster", "geodist", "slopes", "tmap")
+# uncomment these lines if line 7 doesn't work...
+# install.packages(pkgs)
+# install.packages("remotes", quiet = TRUE)
+remotes::install_cran(pkgs, quiet = TRUE)
+
 library(sf)
 library(raster)
 library(geodist)
@@ -78,4 +84,4 @@ mapadeclives
 tmap_save(mapadeclives, "DeclivesPorto.html", append = T)
 
 #exportar shapefile com os declives, em formato GeoPackage (QGIS)
-#st_write(RedeViaria, "RedeViariaPorto_declives.gpkg", append=T)
+#st_write(RedeViaria, "shapefiles/RedeViariaPorto_declives.gpkg", append=T)
