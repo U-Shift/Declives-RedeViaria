@@ -49,17 +49,17 @@ summary(RedeViaria$declive)
 # 0.000   2.176   4.007   5.099   6.795  54.882 
 
 #classes
-RedeViaria$declive_class = ">20: impossível"
-RedeViaria$declive_class[RedeViaria$declive<=20] = "10-20: terrível"
-RedeViaria$declive_class[RedeViaria$declive<=10] = "8-10: exigente"
-RedeViaria$declive_class[RedeViaria$declive<=8] = "5-8: médio"
-RedeViaria$declive_class[RedeViaria$declive<=5] = "3-5: leve"
-RedeViaria$declive_class[RedeViaria$declive<=3] = "0-3: plano"
-RedeViaria$declive_class = factor(RedeViaria$declive_class, levels = c("0-3: plano", "3-5: leve","5-8: médio", "8-10: exigente", "10-20: terrível", ">20: impossível"))
-
+RedeViaria$declive_class =  RedeViaria$declive %>%
+  cut(
+    breaks = c(0, 3, 5, 8, 10, 20, Inf),
+    labels = c("0-3: plano", "3-5: leve","5-8: médio", "8-10: exigente", "10-20: terrível", ">20: impossível"),
+    right = F
+  ) 
 round(prop.table(table(RedeViaria$declive_class))*100,1)
 # 0-3: plano       3-5: leve      5-8: médio  8-10: exigente 10-20: terrível >20: impossível 
 #   36.6            24.0            21.0             7.2            10.1             1.1 
+
+
 
 #palete de cores
 palredgreen = c("#267300", "#70A800", "#FFAA00", "#E60000", "#A80000", "#730000")
