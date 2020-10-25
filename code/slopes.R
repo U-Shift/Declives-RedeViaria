@@ -81,7 +81,7 @@ tm_shape(RedeViaria) +
   )
 mapadeclives
 
-tmap_save(mapadeclives, "DeclivesPorto.html", append = T)
+tmap_save(mapadeclives, "DeclivesPorto.html")
 
 #exportar shapefile com os declives, em formato GeoPackage (QGIS)
 #st_write(RedeViaria, "shapefiles/RedeViariaPorto_declives.gpkg", append=T)
