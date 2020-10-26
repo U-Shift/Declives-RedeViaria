@@ -146,10 +146,12 @@ mapadeclives
 
 #### Gravar em html
 ```{r eval=FALSE}
-tmap_save(mapadeclives, "DeclivesPorto.html", append = T)
+tmap_save(mapadeclives, "DeclivesPorto.html")
 ```
 
 _Dependendo do tamanho da rede, pode ser exigente para a RAM. Esta tinha cerca de 20mil arcos, e só consegui exportar num pc com 16GB_
 
 
-O mapa final pode ser visto online aqui: http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html  
+O mapa final pode ser visto online aqui: http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html    
+
+(Lisboa - http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html )
