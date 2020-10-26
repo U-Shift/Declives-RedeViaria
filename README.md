@@ -94,6 +94,12 @@ summary(values(DEM))
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##  -10.00   24.00   72.00   65.87   97.00  178.00
 
+``` r
+res(DEM)
+```
+
+    ## [1] 0.0002777778 0.0002777778
+
 Este raster tem valores de altimetria entre -10 e 178m. As células são de 27.7m
 
 #### visualizar
@@ -125,7 +131,7 @@ summary(RedeViaria$declive)
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##   0.000   2.176   4.007   5.099   6.795  54.882
 
-Isto significa que metade das vias tem mais de 4% de inclinação, o que é bastante. Para Lisboa, esse valor é de 2.6%.
+Isto significa que metade das vias tem mais de 4% de inclinação, o que é bastante.
 
 Pode-se agora exportar novamente o shapefile
 
@@ -163,7 +169,6 @@ round(prop.table(table(RedeViaria$declive_class))*100,1)
     ##             1.1
 
 ... o que quer dizer que 36.6% das ruas são planas ou quase planas, e cerca de 60% são perfeitamente cicláveis.
-(No caso de Lisboa, cerca de 73% das vias são perfeitamente cicláveis).
 
 Criar uma palete de cores, entre o verde escuro e o vermelho escuro
 
@@ -188,7 +193,7 @@ tm_shape(RedeViaria) +
     popup.vars = c("Declive: " = "declive",
                    "Classe: " = "declive_class"),
     popup.format = list(digits = 1),
-    id = "NAME"
+    id = "NAME" #se o computaor não conseguir exportar por falta de memória, apagar esta linha.
   )
 mapadeclives
 ```
@@ -205,4 +210,16 @@ tmap_save(mapadeclives, "DeclivesPorto.html")
 
 O mapa final pode ser visto online aqui: <http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html>
 
-(Lisboa - <http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html> )
+Para Lisboa
+-----------
+
+O portal de [dados abertos da CML](http://lisboaaberta.cm-lisboa.pt/index.php/pt/) disponibiliza uma rede viária, embora só para vias de heirarquia superior. Por outro lado, disponibiliza dados sobre o [declive longitudinal das vias](http://dados.cm-lisboa.pt/dataset/declive-longitudinal-da-rede-viaria), com uma rede detalhada, e já com o valor de declive (`slope`), embora não forneça informação sobre que tipo de raster foi utilizado para o seu cálculo.
+
+### Exercício
+
+1.  Experimenta fazer o mesmo exercício, gravando o output do `slope_raster` na variável `slopeSRTM` (para não fazer overwrite do `slope`), e **compara os resultados**. Podes usar o `raster/LisboaSRTM_clip.tif`
+2.  Compara os resultados com os declives calculados com um raster de 10m. Shapefile disponível em `shapefiles/RedeViariaLisboa_declives.gpkg`
+
+Declives da rede viária de Lisboa (10m): <http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html>
+
+A mediana do declive das ruas de Lisboa é de 2.6%. 54% das vias são planas ou quase planas (0-3%) e cerca de 73% das vias são perfeitamente cicláveis (0-5%).
