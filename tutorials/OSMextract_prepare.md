@@ -4,14 +4,14 @@ OSM extract and prepare
 Usando conjunto de dados abertos, é possível produzir um mapa de declives da rede viária para qualquer localidade em Portugal.
 Neste tutorial vou descrever como:
 
-1.  Fazer download da rede do Open Street Maps
+1.  Fazer download da rede do [OpenStreetMap](https://www.openstreetmap.org/)
 2.  Seleccionar e Limpar a rede
 3.  Exportar para se produzir o mapa de declives
 
 Fazer download da rede do Open Street Maps
 ------------------------------------------
 
-Para este passo é necessário usar o [package](https://itsleeds.github.io/osmextract/articles/osmextract.html) `osmextract` que faz download do ficheiro mais actual do [**OpenStreetMap**](https://www.openstreetmap.org/) que esteja disponível em <https://download.geofabrik.de/index.html>
+Para este passo é necessário usar o [package](https://itsleeds.github.io/osmextract/articles/osmextract.html) `osmextract` que faz download do ficheiro mais actual do OSM que esteja disponível em <https://download.geofabrik.de/index.html>
 Para Portugal, o ficheiro disponível tem **218MB**. O `osmextract` faz o donwload por região disponível, e converte para o formato `geopackage` (ou .gpkg) (equivalente ao `shapefile`, mas nativo do QGIS).
 
 ``` r
@@ -31,7 +31,7 @@ Para ler o ficheiro `gpkg` já passado para outra directoria:
 portugal_osm = st_read("OSM/geofabrik_portugal-latest.gpkg", layer= "lines")
 ```
 
-O openStreet maps classifica as vias em varias categorias. Vamos apenas seleccionar as seguintes, deixando de fora os caminhos pedonais, que são aqueles que cortam jardins, por exemplo.
+O OpenStreetMap classifica as vias em varias categorias. Vamos apenas seleccionar as seguintes, deixando de fora os caminhos pedonais, que são aqueles que cortam jardins, por exemplo.
 Se quiseremos uma rede mais *leve*, podemos escolher apenas as de categoria primary, secondary e tertiary (e respectivos links), que correspondem aos níveis mais elevados de uma rede viária.
 
 > muitas vezes as vias estão mal classificadas no OSM. Pode-se [ir lá editar](https://www.openstreetmap.org/edit) (é um mapa colaborativo!). Neste caso optei por seleccionar também as `unclassified`.
@@ -45,7 +45,7 @@ portugal_osm_filtered = portugal_osm %>%
 Seleccionar e limpar a rede
 ---------------------------
 
-#### Seleccionar o Concelho
+### Seleccionar o Concelho
 
 Imaginando que queremos produzir um mapa de declives para todo o Concelho da **Guarda**.
 Na pasta [shapefiles](https://github.com/U-Shift/Declives-RedeViaria/tree/main/shapefiles) encontra-se um ficheiro com todos os concelhos de Portugal continental (ver como foi produzido a partir da Carta Administrativa Oficial de Portugal em [/code](https://github.com/U-Shift/Declives-RedeViaria/blob/main/code/CAOPconcelhos.R)).
@@ -56,7 +56,7 @@ Concelhos$Concelho  #Ver lista com os nomes dos concelhos disponíveis
 ConcelhoLimite = Concelhos %>% filter(Concelho == "GUARDA") #aqui podemos escolher outro qualquer
 ```
 
-#### Cortar a rede de Portugal com o limite do concelho
+### Cortar a rede de Portugal com o limite do concelho
 
 Aplica-se um buffer de 100m (pode ser mais) para aquelas vias que muitas vezes estão mesmo no limite do concelho não ficarem cortadas.
 
@@ -66,7 +66,7 @@ osm_lines_Concelho = st_crop(portugal_osm_filtered, ConcelhoLimite) #corta nos b
 RedeOSM_Concelho = st_intersection(osm_lines_Concelho, geo_buffer(ConcelhoLimite, dist=100)) #clip com um buffer de 100m
 ```
 
-#### Limpar os segmentos que não estão ligados à rede
+### Limpar os segmentos que não estão ligados à rede
 
 Queremos excluir aqueles segmentos que não estão ligados à rede principal. Muitas vezes têm a topologia mal definida (se bem que no OSM a rede já vem corrigida), ou com o filtro inicialmente aplicado perderam-se ligações. este exemplo da rede do Porto mostra aqueles que queremos excluir.
 ![](figs/DisconnectedIslands.PNG)
@@ -94,7 +94,7 @@ RedeViaria = portugal_osm_filtered %>% filter(osm_id %in% RedeOSM_Concelho_clean
 st_geometry(RedeViaria) #verificar se são LINESTRING
 ```
 
-#### Resolver interseccões
+### Resolver interseccões
 
 Por um lado, queremos que os segmentos se partem nos seus nós (`nodes`), para termos um declive memlhor aproximado. Um segmento muito longo irá ter um declive médio atribuído, mas um segmento muito longo pode ser partido nos seus nós e ter um declive próprio em cada parte do segmento.
 Vejamos este exemplo da Rua D. João V (Porto), antes e após se partir aquele troço nos seus vértices internos:
