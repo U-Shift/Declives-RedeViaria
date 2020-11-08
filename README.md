@@ -22,11 +22,11 @@ Perparação dos ficheiros
 A rede viária pode ser obtida de várias formas. Em primeiro lugar, experimentar procurar nos "dados abertos" da câmara municipal em questão. Esses dados estão normalmente *limpos* e actualizados.
 
 Caso não estejam disponíveis, pode-se usar os dados abertos do [**Open Steet Map**](https://www.openstreetmap.org/) (OSM).
-Para tal, pode-se recorrer ao **QGIS** (outro software livre de Sistemas de Informação Geográfica), e instalar um plugin [**OSM donwloader**](https://plugins.qgis.org/plugins/OSMDownloader/). Instalar um plugin no QGIS [é simples](https://docs.qgis.org/3.10/en/docs/training_manual/qgis_plugins/fetching_plugins.html).
+O problema é que a rede viária normalmente tem de ser *limpa*. Por exemplo, faz sentido manter as escadas, os túneis e auto-estradas para caminhos em bicicleta? **Ver o tutorial de como extrair e limpar uma rede viária do OSM, usando apenas o *R***: [tutorials/OSMextract\_prepare.md](https://github.com/U-Shift/Declives-RedeViaria/blob/main/tutorials/OSMextract_prepare.md).
 
-O problema é que a rede viária normalmente tem de ser *limpa*. Por exemplo, faz sentido manter as escadas, os túneis e auto-estradas para caminhos em bicicleta?
+Ou então, pode-se recorrer ao **QGIS** (outro software livre de Sistemas de Informação Geográfica), e instalar um plugin [**OSM donwloader**](https://plugins.qgis.org/plugins/OSMDownloader/). Instalar um plugin no QGIS [é simples](https://docs.qgis.org/3.10/en/docs/training_manual/qgis_plugins/fetching_plugins.html).
 
-Para o Porto, o ficheiro `sentidos-link.shp` já foi limpo pelo [mpschlickmann](https://github.com/mpschlickmann), e está disponibilizado na pasta `shapefiles`.
+Para o Porto, o ficheiro `RedeViariaPorto_osm.shp` já foi limpo segundo o [tutorial](https://github.com/U-Shift/Declives-RedeViaria/blob/main/tutorials/OSMextract_prepare.md), e está disponibilizado na pasta `shapefiles`.
 
 ### Modelo Digital do Terreno
 
@@ -56,25 +56,25 @@ library(tmap)
 #### shapefile
 
 ``` r
-RedeViaria = st_read("shapefiles/sentidos_link.shp")
+RedeViaria = st_read("shapefiles/RedeViariaPorto_osm.shp")
 ```
 
-    ## Reading layer `sentidos_link' from data source `D:\GIS\Porto\Declives-RedeViaria\shapefiles\sentidos_link.shp' using driver `ESRI Shapefile'
-    ## Simple feature collection with 19854 features and 6 fields
+    ## Reading layer `RedeViariaPorto_osm' from data source `D:\GIS\Porto\Declives-RedeViaria\shapefiles\RedeViariaPorto_osm.shp' using driver `ESRI Shapefile'
+    ## Simple feature collection with 13738 features and 9 fields
     ## geometry type:  LINESTRING
     ## dimension:      XY
-    ## bbox:           xmin: -966257.6 ymin: 5027255 xmax: -950956 ymax: 5034212
-    ## projected CRS:  Sphere_Mercator
+    ## bbox:           xmin: -8.694169 ymin: 41.12601 xmax: -8.547498 ymax: 41.19294
+    ## geographic CRS: WGS 84
 
 ``` r
-#está em coodenadas esféricas, projectar em WGS84
-RedeViaria = st_transform(RedeViaria, 4326) 
+# RedeViaria = st_transform(RedeViaria, 4326) #projectar em WGS84
+# RedeViaria = st_cast(RedeViaria, "LINESTRING", do_split=F) #o slopes só permite linestrings, mas não deixarque parta as linhas
 class(RedeViaria)
 ```
 
     ## [1] "sf"         "data.frame"
 
-Esta rede tem quase 20mil segmentos.
+Esta rede tem quase 14mil segmentos.
 
 #### raster com altimetria
 
@@ -116,10 +116,10 @@ plot(sf::st_geometry(RedeViaria), add = TRUE)
 Através do package [**slopes**](https://github.com/itsleeds/slopes), vai-se calcular os declives de cada segmento da rede, em modo absoluto. Ler mais na página do package sobre como são calculados.
 
 ``` r
-RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #62 segundos
+RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #28 segundos
 ```
 
-    ## [1] FALSE
+    ## [1] TRUE
 
 Declives em percentagem: *mínimo, P25, mediana, média, P75, max*.
 
@@ -129,21 +129,9 @@ summary(RedeViaria$declive)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##   0.000   2.176   4.007   5.099   6.795  54.882
+    ##   0.000   2.347   4.222   5.449   7.121  67.547
 
 Isto significa que metade das vias tem mais de 4% de inclinação, o que é bastante.
-
-Pode-se agora exportar novamente o shapefile
-
-``` r
-#exportar shapefile com os declives, em formato GeoPackage (QGIS)
-st_write(RedeViaria, "shapefiles/RedeViariaPorto_declives.gpkg", append=T)
-```
-
-Exportar para html
-------------------
-
-### Preparar dados para visualização
 
 Criar classes de declives, com labels perceptíveis
 
@@ -164,11 +152,35 @@ round(prop.table(table(RedeViaria$declive_class))*100,1)
 
     ## 
     ##      0-3: plano       3-5: leve      5-8: médio  8-10: exigente 10-20: terrível 
-    ##            36.6            24.0            21.0             7.2            10.1 
+    ##            34.3            24.0            21.4             7.7            10.8 
     ## >20: impossível 
-    ##             1.1
+    ##             1.8
 
-... o que quer dizer que 36.6% das ruas são planas ou quase planas, e cerca de 60% são perfeitamente cicláveis.
+... o que quer dizer que 34.4% das ruas são planas ou quase planas, e cerca de 58% são perfeitamente cicláveis.
+
+Pode-se agora exportar novamente o shapefile
+
+``` r
+#exportar shapefile com os declives, em formato GeoPackage (QGIS)
+st_write(RedeViaria, "shapefiles/RedeViariaPorto_declives.gpkg", append=F)
+```
+
+    ## Deleting layer `RedeViariaPorto_declives' using driver `GPKG'
+    ## Writing layer `RedeViariaPorto_declives' to data source `shapefiles/RedeViariaPorto_declives.gpkg' using driver `GPKG'
+    ## Writing 13738 features with 12 fields and geometry type Line String.
+
+``` r
+#exportar em formato kml (GoogleMaps)
+st_write(RedeViaria, "shapefiles/RedeViariaPorto_declives.kml", append=F)
+```
+
+    ## Writing layer `RedeViariaPorto_declives' to data source `shapefiles/RedeViariaPorto_declives.kml' using driver `KML'
+    ## Writing 13738 features with 12 fields and geometry type Line String.
+
+Exportar para html
+------------------
+
+### Preparar dados para visualização
 
 Criar uma palete de cores, entre o verde escuro e o vermelho escuro
 
@@ -193,7 +205,8 @@ tm_shape(RedeViaria) +
     popup.vars = c("Declive: " = "declive",
                    "Classe: " = "declive_class"),
     popup.format = list(digits = 1),
-    id = "NAME" #se o computaor não conseguir exportar por falta de memória, apagar esta linha.
+    # id = "declive"
+    id = "name" #se o computaor não conseguir exportar por falta de memória, apagar esta linha.
   )
 mapadeclives
 ```
@@ -213,17 +226,17 @@ O mapa final pode ser visto online aqui: <http://web.tecnico.ulisboa.pt/~rosamfe
 Para Lisboa
 -----------
 
-O portal de [dados abertos da CML](http://lisboaaberta.cm-lisboa.pt/index.php/pt/) disponibiliza uma rede viária, embora só para [vias de heirarquia superior](http://dados.cm-lisboa.pt/dataset/rede-viaria-escala-1-20000), e um [Modelo Digital do Terreno](http://dados.cm-lisboa.pt/dataset/modelo-digital-de-terreno), ebora com uma resolução de 48m.
+O portal de [dados abertos da CML](http://lisboaaberta.cm-lisboa.pt/index.php/pt/) disponibiliza uma rede viária, embora só para [vias de heirarquia superior](http://dados.cm-lisboa.pt/dataset/rede-viaria-escala-1-20000), e um [Modelo Digital do Terreno](http://dados.cm-lisboa.pt/dataset/modelo-digital-de-terreno), embora com uma resolução de 48m.
 
 Por outro lado, disponibiliza dados sobre o [declive longitudinal das vias](http://dados.cm-lisboa.pt/dataset/declive-longitudinal-da-rede-viaria), com uma rede detalhada, e já com o valor de declive (`slope`), embora não forneça informação sobre que tipo de raster foi utilizado para o seu cálculo.
 
 ### Exercício
 
 1.  Experimenta fazer o mesmo exercício, gravando o output do `slope_raster` na variável `slopeNASA` (para não fazer overwrite do `slope`), e **compara os resultados**. Podes usar o `raster/LisboaNASA_clip.tif`
-2.  Compara os resultados com os declives calculados com um raster de 10m, do IST. Shapefile disponível em `shapefiles/RedeViariaLisboa_declives.gpkg`.
+2.  Compara os resultados com os declives calculados com um raster de 10m, do IST. Shapefile disponível em `shapefiles/RedeViariaLisboa2012_declives_etrs89.gpkg`.
 
 Declives da rede viária de Lisboa (10m): <http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html>
 
 ![Lisboa](https://github.com/U-Shift/Declives-RedeViaria/blob/main/README_files/figure-markdown_github/Lisboa_declives.PNG?raw=true)
 
-A mediana do declive das ruas de Lisboa é de 2.6%. 54% das vias são planas ou quase planas (0-3%) e cerca de 73% das vias são perfeitamente cicláveis (0-5%).
+> A mediana do declive das ruas de Lisboa é de 2.6%. 49% das vias são planas ou quase planas (0-3%) e cerca de 72% das vias são perfeitamente cicláveis (0-5%).

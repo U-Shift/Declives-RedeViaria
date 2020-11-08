@@ -107,11 +107,11 @@ Ver a percentagem de cada classe para toda a rede
 ```{r}
 round(prop.table(table(RedeViaria$declive_class))*100,1)
 ```
-... o que quer dizer que 34.4% das ruas são planas ou quase planas, e cerca de 58% são perfeitamente cicláveis.  
+... o que quer dizer que 34.3% das ruas são planas ou quase planas, e cerca de 58% são perfeitamente cicláveis.  
 
 
 Pode-se agora exportar novamente o shapefile
-```{r eval=FALSE}
+```{r eval=F}
 #exportar shapefile com os declives, em formato GeoPackage (QGIS)
 st_write(RedeViaria, "shapefiles/RedeViariaPorto_declives.gpkg", append=F)
 #exportar em formato kml (GoogleMaps)
@@ -154,7 +154,7 @@ mapadeclives
 tmap_save(mapadeclives, "DeclivesPorto.html")
 ```
 
-_Dependendo do tamanho da rede, pode ser exigente para a RAM. Esta tinha cerca de 20mil arcos, e só consegui exportar num pc com 16GB_
+_Dependendo do tamanho da rede, pode ser exigente para a RAM. Esta tinha cerca de 14mil arcos, e só consegui exportar num pc com 16GB_
 
 O mapa final pode ser visto online aqui: http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html    
 
@@ -168,10 +168,10 @@ Por outro lado, disponibiliza dados sobre o [declive longitudinal das vias](http
 1. Experimenta fazer o mesmo exercício, gravando o output do `slope_raster` na variável `slopeNASA` (para não fazer overwrite do `slope`), e **compara os resultados**.
 Podes usar o `raster/LisboaNASA_clip.tif`
 2. Compara os resultados com os declives calculados com um raster de 10m, do IST.
-Shapefile disponível em `shapefiles/RedeViariaLisboa2012_declives_etrs89.gpkg`.
+Shapefile disponível em `shapefiles/RedeViariaLisboa2012_declives_etrs89.gpkg`. Que diferenças?
 
 Declives da rede viária de Lisboa (10m): http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html
 
 ![Lisboa](https://github.com/U-Shift/Declives-RedeViaria/blob/main/README_files/figure-markdown_github/Lisboa_declives.PNG?raw=true)
 
-> A mediana do declive das ruas de Lisboa é de 2.6%. 54% das vias são planas ou quase planas (0-3%) e cerca de 73% das vias são perfeitamente cicláveis (0-5%). 
+> A mediana do declive das ruas de Lisboa é de 2.6%. 49% das vias são planas ou quase planas (0-3%) e cerca de 72% das vias são perfeitamente cicláveis (0-5%). 
