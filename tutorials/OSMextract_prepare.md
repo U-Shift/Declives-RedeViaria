@@ -98,9 +98,10 @@ st_geometry(RedeViaria) #verificar se são LINESTRING
 
 Por um lado, queremos que os segmentos se partem nos seus nós (`nodes`), para termos um declive memlhor aproximado. Um segmento muito longo irá ter um declive médio atribuído, mas um segmento muito longo pode ser partido nos seus nós e ter um declive próprio em cada parte do segmento.
 Vejamos este exemplo da Rua D. João V (Porto), antes e após se partir aquele troço nos seus vértices internos:
+
 <img src="figs/SplitLines_nodes.PNG?raw=true" alt="sem partir" style="width:40.0%" /> <img src="figs/SplitLines_nodes_stplanr.PNG?raw=true" alt="depois de partir" style="width:40.0%" />
 
-Por outro lado, não queremos que sejam criados *nodes* artificiais nos sítios onde duas linhas se cruzem, mesmo tendo elas diferentes níveis **z**, os tais *brunels*: *bridges and tunnels*. O `v.clean` do GRASS (QGIS) acaba por parti-los :/ .O OSM representa as pontes e túneis como linhas que não se interssectam, e convém preservar esse formato.
+Por outro lado, não queremos que sejam criados *nodes* artificiais nos sítios onde duas linhas se cruzam, mesmo tendo elas diferentes níveis **z**, os tais *brunels*: *bridges and tunnels*. O `v.clean` do GRASS (QGIS) acaba por parti-los :/ .O OSM representa as pontes e túneis como linhas que não se interssectam, e convém preservar esse formato.
 A função [`rnet_breakup_vertices`]() parte os segmentos nos seus vértices internos, preservando os *brunels*. Irá também aumentar o número de segmentos presentes na rede.
 
 ``` r
