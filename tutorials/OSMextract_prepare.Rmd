@@ -34,7 +34,7 @@ Para ler o ficheiro `gpkg` já passado para outra directoria:
 portugal_osm = st_read("OSM/geofabrik_portugal-latest.gpkg", layer= "lines")
 ```
 O openStreet maps classifica as vias em varias categorias. Vamos apenas seleccionar as seguintes, deixando de fora os caminhos pedonais, que são aqueles que cortam jardins, por exemplo.  
-Se quiseremos uma rede mais "leve", podemos escolher apenas os primary, secondary e tertiart (e respectivos links), que corresponde aos níveis mais elevados de uma rede viária.  
+Se quiseremos uma rede mais _leve_, podemos escolher apenas os primary, secondary e tertiart (e respectivos links), que corresponde aos níveis mais elevados de uma rede viária.  
 > muitas vezes as vias estão mal classificadas no OSM. Pode-se [ir lá editar](https://www.openstreetmap.org/edit) (é um mapa colaborativo!). Neste caso optei por seleccionar também as `unclassified`.
 
 ```{r eval=FALSE}
@@ -56,30 +56,47 @@ ConcelhoLimite = Concelhos %>% filter(Concelho == "GUARDA") #aqui podemos escolh
 .
 #### Cortar a rede de Portugal com o limite do concelho
 Aplica-se um buffer de 100m (pode ser mais) para aquelas vias que muitas vezes estão mesmo no limite do concelho não ficarem cortadas.
-```{r}
+```{r eval=FALSE}
 library(stplanr)
 osm_lines_Concelho = st_crop(portugal_osm_filtered, ConcelhoLimite) #corta nos bounding boxes, para não ficar tão pesado na operação seguinte
 RedeOSM_Concelho = st_intersection(osm_lines_Concelho, geo_buffer(ConcelhoLimite, dist=100)) #clip com um buffer de 100m
 ```
 
 #### Limpar os segmentos que não estão ligados à rede
-Queremos excluir aqueles segmentos que não estão ligados à rede principal. Muitas vezes têm a topologia mal definida (se bem que no OSM a rede já vem corrigida), ou com o filtro inicialmente aplicado perderam-se ligações. este exemplo da rede do Porto mostra aqueles que queremos excluir.
+Queremos excluir aqueles segmentos que não estão ligados à rede principal. Muitas vezes têm a topologia mal definida (se bem que no OSM a rede já vem corrigida), ou com o filtro inicialmente aplicado perderam-se ligações. este exemplo da rede do Porto mostra aqueles que queremos excluir.  
+!()[figs/DisconnectedIslands.PNG?raw=true]{width=50%}
+  
+Para isso usamos a função rnet_group(), do package stplanar, que vai avaliar a conectividade de cada segmento e atribuir um grupo (uma espécie de cluster). Depois só temos de filtrar aqueles segmentos que fazem parte do grupo principal, que será o que tem mais segmentos ligados.  
+> Muitas vezes há ciclovias que não estão ligadas à rede, sendo apenas segmentos "soltos".
 
+Isto é um workaround de limpeza da rede, descartando aqueles que não estão ligados. Também podemos abrir no QGIS, correr o pluggin [Disconnected Islands](http://plugins.qgis.org/plugins/disconnected-islands/), e ver em que grupos estão os segmentos, editando as suas ligações se for o caso.
 ```{r}
 library(igraph)
 RedeOSM_Concelho$group = stplanr::rnet_group(RedeOSM_Concelho)
-table(RedeOSM_Concelho$group)
-plot(RedeOSM_Concelho["group"])
+# table(RedeOSM_Concelho$group)
+# plot(RedeOSM_Concelho["group"])
 
-RedeOSM_Concelho_clean = RedeOSM_Concelho %>% filter(group == 1)
-# mapview::mapview(RedeOSM_Guarda_clean) #verificar
-
-RedeViaria = portugal_osm_filtered %>% filter(osm_id %in% RedeOSM_Concelho_clean$osm_id) #pegar apenas as da shape limpa
-st_geometry(RedeViaria) #check if the are LINESTRING
-RedeViaria = stplanr::rnet_breakup_vertices(RedeViaria)
+RedeOSM_Concelho_clean = RedeOSM_Concelho %>% filter(group == 1) #o que tem mais segmentos
+# mapview::mapview(RedeOSM_Concelho_clean) #verificar
 ```
 
+Todos estes processos fizeram com que o tipo de geometria da rede _limpa_"_ seja `GEOMETRY` ou `MULTILINESTRING`. Como o slopes() só funciona com `LINESTRING`, vamos novamente pegar na rede OSM original e filtrar pelos `id` que ficaram na rede _limpa_.
+Poderiamos usar o `sf::st_cass(..., "LINESTRING")`, mas isso iria também partir a rede em todas as intersessções que encontrasse.
+```{r}
+st_geometry(RedeOSM_Concelho_clean)
+RedeViaria = portugal_osm_filtered %>% filter(osm_id %in% RedeOSM_Concelho_clean$osm_id) #ficar apenas os segmentos da rede limpa
+st_geometry(RedeViaria) #check if the are LINESTRING
+```
 
+Por outro lado, queremos que os segmentos se partem nos seus nós (`nodes`), para termos um declive memlhor aproximado. Um segmento muito longo irá ter um declive médio atribuído, mas um segmento muito longo pode ser partido nos seus nós e ter um declive próprio em cada parte do segmento.  
+Vejamos este exemplo da Rua D. João V (Porto), antes e após se partir aquele troço nos seus vértices internos:  
+!()[figs/SplitLines_nodes.PNG?raw=true]{width=30%} !()[figs/SplitLines_nodes.PNG?raw=true =300x]{width=30%}
+
+
+
+```{r}
+RedeViaria = stplanr::rnet_breakup_vertices(RedeViaria)
+```
 
 
 ```{r eval=FALSE}
