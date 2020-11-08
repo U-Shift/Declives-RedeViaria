@@ -102,6 +102,7 @@ A função [`rnet_breakup_vertices`]() parte os segmentos nos seus vértices int
 nrow(RedeViaria)
 RedeViaria = stplanr::rnet_breakup_vertices(RedeViaria)
 nrow(RedeViaria)
+# st_write(RedeViaria, "shapefiles/RedeViariaGuarda_osm.shp")
 ```
 Exemplo da rede do Porto, após esta função:  
 ![por baixo da ponte](figs/SplitLines_nodes_stplanrBridge.PNG?raw=true){ width=40% } ![nó do viaduto](figs/SplitLines_nodes_stplanrBridge2.PNG?raw=true){ width=40% }
@@ -121,7 +122,10 @@ summary(values(DEM))
 res(DEM) #verificar a resolução deste raster
 raster::plot(DEM)
 plot(sf::st_geometry(RedeViaria), add = TRUE) #verificar se coincidem
+```
+![GuardaDEM](figs/GuardaDEM.PNG?raw=true)
 
+```{r message=FALSE, warning=FALSE}
 RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #19s
 RedeViaria$declive = RedeViaria$slope*100
 RedeViaria$declive_class = RedeViaria$declive %>%
@@ -151,6 +155,7 @@ mapadeclives =
   )
 # mapadeclives
 ```
+
 
 E exportar com mapa interactivo em html:
 ```{r eval=FALSE}
