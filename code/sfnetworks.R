@@ -63,7 +63,13 @@ PUORTO = PUORTO %>% filter(rownames(PUORTO) %in% RedeOSM_Porto_clean$osm_id) #pe
 PUORTOnwt = sf_to_tidygraph(PUORTO, directed = T)
 
 
-LUISBOA <- opq(bbox =  st_bbox(LisboaLimite)) %>% 
+
+
+Concelhos = st_read("shapefiles/ConcelhosPT.gpkg")
+ConcelhoLimite = Concelhos %>% filter(Concelho == "LISBOA")
+ConcelhoLimite= geo_buffer(ConcelhoLimite, dist=100)
+
+LUISBOA <- opq(bbox =  st_bbox(ConcelhoLimite)) %>% 
   add_osm_feature(key = 'highway') %>% 
   osmdata_sf() %>% 
   osm_poly2line()
