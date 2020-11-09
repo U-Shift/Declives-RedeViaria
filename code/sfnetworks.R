@@ -55,6 +55,14 @@ PUORTO
 ggplot(data = PUORTO) + geom_sf()
 
 
+PUORTO = PUORTO %>% filter(rownames(PUORTO) %in% RedeOSM_Porto_clean$osm_id) #pegar apenas as da shape limpa no qgis
+
+PUORTOnwt = sf_to_tidygraph(PUORTO, directed = T)
+
+PUORTO = PUORTO %>% filter(rownames(PUORTO) %in% RedeOSM_Porto_clean$osm_id) #pegar apenas as da shape limpa no qgis
+PUORTOnwt = sf_to_tidygraph(PUORTO, directed = T)
+
+
 LUISBOA <- opq(bbox =  st_bbox(LisboaLimite)) %>% 
   add_osm_feature(key = 'highway') %>% 
   osmdata_sf() %>% 
@@ -62,14 +70,24 @@ LUISBOA <- opq(bbox =  st_bbox(LisboaLimite)) %>%
 LUISBOA <- LUISBOA$osm_lines %>% 
   select(highway)
 
+LUISBOA
+ggplot(data = LUISBOA) + geom_sf()
+
+RedeOSM_Lisboa_clean = st_read("shapefiles/RedeViariaLisboa_osm.shp")
+LUISBOA = LUISBOA %>% filter(rownames(LUISBOA) %in% RedeOSM_Lisboa_clean$osm_id) #pegar apenas as da shape limpa no qgis
+LUISBOAnwt = sf_to_tidygraph(LUISBOA, directed = T)
 
 
-PUORTO = PUORTO %>% filter(rownames(PUORTO) %in% RedeOSM_Porto_clean$osm_id) #pegar apenas as da shape limpa no qgis
-
-PUORTOnwt = sf_to_tidygraph(PUORTO, directed = T)
 
 
 graph <- PUORTOnwt %>%
+  activate(edges) %>%
+  mutate(length = st_length(geometry))
+graph
+
+
+
+graph <- LUISBOAnwt %>%
   activate(edges) %>%
   mutate(length = st_length(geometry))
 graph
@@ -138,7 +156,10 @@ graph <- graph %>%
 ggplot() +
   geom_sf(data = graph %>% activate(edges) %>% as_tibble() %>% st_as_sf(), aes(col = betweenness, size = betweenness)) +
   scale_colour_viridis_c(option = 'inferno') +
-  scale_size_continuous(range = c(0,4))
+  scale_size_continuous(range = c(0,4)) +
+  theme_classic()
+
+
 
 resumo = graph %>%
   activate(edges) %>%
