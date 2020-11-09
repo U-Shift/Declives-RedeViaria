@@ -21,7 +21,8 @@ library(osmextract)
 library(sf)
 library(tidyverse)
 
-portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE, quiet = FALSE, force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
+portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE, quiet = FALSE,
+                      force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
 ```
 
 O ficheiro fica guardado na pasta de ficheiros temporários, pode-se mover para outra localização, caso necessário não se ter de fazer donwload novamente.
@@ -39,7 +40,9 @@ Se quiseremos uma rede mais *leve*, podemos escolher apenas as de categoria prim
 ``` r
 table(portugal_osm$highway)
 portugal_osm_filtered = portugal_osm %>% 
-  dplyr::filter(highway %in% c('primary', "primary_link", 'secondary',"secondary_link", 'tertiary', "tertiary_link", "trunk", "trunk_link", "residential", "cycleway", "living_street", "unclassified", "motorway", "motorway_link", "pedestrian", "steps", "service", "track"))
+  dplyr::filter(highway %in% c('primary', "primary_link", 'secondary',"secondary_link", 'tertiary', "tertiary_link",
+                "trunk", "trunk_link", "residential", "cycleway", "living_street", "unclassified",
+                "motorway", "motorway_link", "pedestrian", "steps", "service", "track"))
 ```
 
 Seleccionar e limpar a rede
@@ -133,7 +136,7 @@ raster::plot(DEM)
 plot(sf::st_geometry(RedeViaria), add = TRUE) #verificar se coincidem
 ```
 
-![GuardaDEM](figs/GuardaDEM.PNG?raw=true)
+![GuardaDEM](figs/GuardaDEM.png?raw=true)
 
 ``` r
 RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #19s
@@ -163,7 +166,7 @@ mapadeclives =
     # id = "declive"
     id = "name" #se o computador não conseguir exportar, por falta de memória, apagar esta linha.
   )
-# mapadeclives
+mapadeclives
 ```
 
 E exportar com mapa interactivo em html:
