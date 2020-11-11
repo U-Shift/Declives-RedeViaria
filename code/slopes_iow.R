@@ -17,28 +17,29 @@ library(stplanr)
 iow_network$group = stplanr::rnet_group(iow_network)
 plot(iow_network["group"])
 iow_network_clean = iow_network %>% filter(group == 1) #the network with more connected segments
-# 100*nrow(iow_network_clean)/nrow(iow_network) #percentage of the remaining highways
+100*nrow(iow_network_clean)/nrow(iow_network) #percentage of the remaining highways
 
 iow_network_segments = stplanr::rnet_breakup_vertices(iow_network_clean)
-# nrow(iow_network_segments)/nrow(iow_network_clean) #multiply factor
+nrow(iow_network_segments)/nrow(iow_network_clean) #multiply factor
 
 
 # Import DEM (extracted with QGIS SRTM Downloader plugin and clipped)
 library(raster)
-library(geodist)
 DEM = raster("raster/IsleOfWightNASA_clip.tif")
 class(DEM)
 summary(values(DEM))
 res(DEM) #27m of resolution
-raster::plot(DEM)
 network = iow_network_segments
+raster::plot(DEM)
 plot(sf::st_geometry(network), add = TRUE) #check if they overlay
+
 
 # Get the slope value for each segment (abs), using slopes package
 library(slopes)
-network$slope = slope_raster(network, e = DEM)
+library(geodist)
+network$slope = slope_raster(network, e = DEM) #aoubt 15sec
 network$slope = network$slope*100 #percentage
-summary(network$slope)
+summary(network$slope) #!
 
 # Classify slopes
 network$slope_class = network$slope %>%
@@ -78,3 +79,6 @@ tmap_save(slopemap, "SlopesIoW.html") #export to html
 # st_write(network, "shapefiles/SlopesIoW.gpkg", append=F) #geopackage
 # st_write(network, "shapefiles/SlopesIoW.shp", append=F) #shapefile
 # st_write(network, "shapefiles/SlopesIoW.kml", append=F) #GoogleMaps
+
+# tidy up
+rm(iow_osm,iow_network_clean,iow_network_segments, iow_network, slopemap)
