@@ -103,7 +103,8 @@ mapadeclives =
     palette = palredgreen, #palete de cores
     lwd = 2, #espessura das linhas
     title.col = "Declive [%]",
-    popup.vars = c("Declive: " = "declive",
+    popup.vars = c("Tipo: " = "highway",
+                   "Declive: " = "declive",
                    "Classe: " = "declive_class"),
     popup.format = list(digits = 1),
     # id = "declive"
