@@ -25,7 +25,7 @@ nrow(iow_network_segments)/nrow(iow_network_clean) #multiply factor
 
 # Import DEM (extracted with QGIS SRTM Downloader plugin and clipped)
 library(raster)
-DEM = raster("raster/IsleOfWightNASA_clip.tif")
+DEM = raster("https://github.com/U-Shift/Declives-RedeViaria/releases/download/0.2/IsleOfWightNASA_clip.tif")
 class(DEM)
 summary(values(DEM))
 res(DEM) #27m of resolution
@@ -37,7 +37,7 @@ plot(sf::st_geometry(network), add = TRUE) #check if they overlay
 # Get the slope value for each segment (abs), using slopes package
 library(slopes)
 library(geodist)
-network$slope = slope_raster(network, e = DEM) #aoubt 15sec
+network$slope = slope_raster(network, e = DEM) #about 15sec
 network$slope = network$slope*100 #percentage
 summary(network$slope) #!
 
@@ -53,15 +53,15 @@ round(prop.table(table(network$slope_class))*100,1)
 
 # make an interactive map
 library(tmap)
-palredgreen = c("#267300", "#70A800", "#FFAA00", "#E60000", "#A80000", "#730000")
+palredgreen = c("#267300", "#70A800", "#FFAA00", "#E60000", "#A80000", "#730000") #color palette
 tmap_mode("view")
 tmap_options(basemaps = leaflet::providers$CartoDB.Positron) #mapa base
 slopemap =
   tm_shape(network) +
   tm_lines(
     col = "slope_class",
-    palette = palredgreen, #palete de cores
-    lwd = 2, #espessura das linhas
+    palette = palredgreen,
+    lwd = 2, #line width
     title.col = "Slope [%]",
     popup.vars = c("Highway" = "highway",
                   "Slope: " = "slope",
