@@ -19,13 +19,15 @@ Recomenda-se estes dois softwares:
 * [R project](https://www.r-project.org/)
 * [QGIS](https://qgis.org/en/site/)
 
+_For an english version, check this [quick script](https://github.com/U-Shift/Declives-RedeViaria/blob/main/code/slopes_iow.R)._
 
 ## Perparação dos ficheiros
 ### Rede Viária
 A rede viária pode ser obtida de várias formas. Em primeiro lugar, experimentar procurar nos "dados abertos" da câmara municipal em questão. Esses dados estão normalmente _limpos_ e actualizados.  
 
 Caso não estejam disponíveis, pode-se usar os dados abertos do [**Open Steet Map**](https://www.openstreetmap.org/) (OSM).  
-O problema é que a rede viária normalmente tem de ser _limpa_. Por exemplo, faz sentido manter as escadas, os túneis e auto-estradas para caminhos em bicicleta? **Ver o tutorial de como extrair e limpar uma rede viária do OSM, usando apenas o _R_**: [tutorials/OSMextract_prepare.md](https://github.com/U-Shift/Declives-RedeViaria/blob/main/tutorials/OSMextract_prepare.md).
+O problema é que a rede viária normalmente tem de ser _limpa_. Por exemplo, faz sentido manter as escadas, os túneis e auto-estradas para caminhos em bicicleta?   
+**Ver o tutorial de como extrair e limpar uma rede viária do OSM, usando apenas o _R_**: [tutorials/OSMextract_prepare.md](https://github.com/U-Shift/Declives-RedeViaria/blob/main/tutorials/OSMextract_prepare.md).
 
 Ou então, pode-se recorrer ao **QGIS** (outro software livre de Sistemas de Informação Geográfica), e instalar um plugin [**OSM donwloader**](https://plugins.qgis.org/plugins/OSMDownloader/). Instalar um plugin no QGIS [é simples](https://docs.qgis.org/3.10/en/docs/training_manual/qgis_plugins/fetching_plugins.html).
 
@@ -34,7 +36,7 @@ Para o Porto, o ficheiro `RedeViariaPorto_osm.shp` já foi limpo segundo o [tuto
 ### Modelo Digital do Terreno
 Estes raster são difíceis de obter gratuitamente para resoluções melhores. Para o caso de uma Rede Viária, seria bom ter um raster com células de 10metros ou menos.
 
-Os dados do SRTM (_Shuttle Radar Topography Mission_), uma missão da NASA, estão [disponíveis gratuitamente](https://gisgeography.com/srtm-shuttle-radar-topography-mission/), mas para uma resolução de 25 a 30m, com erro da altimetria vertical de 16m.
+Os dados do SRTM (_Shuttle Radar Topography Mission_), uma missão da NASA, estão [disponíveis gratuitamente](https://gisgeography.com/srtm-shuttle-radar-topography-mission/), mas para uma resolução de 25 a 30m, com erro da altimetria vertical de 16m - [saber mais](https://www2.jpl.nasa.gov/srtm/).
 Para fazer donwload do _tile_ correcto, pode-se também recorrer a um outro plugin do QGIS, o [SRTM-Donwloader](https://plugins.qgis.org/plugins/SRTM-Downloader/), e pedir para guardar o raster que cobre a shapefile da rede viária - é uma opção no QGIS.
 
 Como o raster cobre uma área bem maior do que necessitamos (ver ficheiro `N41W009.hgt`), podemos sempre fazer um _clip_ para ficar com dimensões mais adequadas à nossa análise: `Raster > Extraction > Clip Raster by Extent`
@@ -140,7 +142,8 @@ tm_shape(RedeViaria) +
     palette = palredgreen, #palete de cores
     lwd = 2, #espessura das linhas
     title.col = "Declive [%]",
-    popup.vars = c("Declive: " = "declive",
+    popup.vars = c("Tipo :" = "highway",
+                   "Declive: " = "declive",
                    "Classe: " = "declive_class"),
     popup.format = list(digits = 1),
     # id = "declive"
