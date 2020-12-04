@@ -250,7 +250,7 @@ tmap_save(mapadeclives, "DeclivesPorto.html")
 ```
 
 *Dependendo do tamanho da rede, pode ser exigente para a RAM. Esta tinha
-cerca de 14mil arcos, e só consegui exportar num pc com 16GB*
+cerca de 14mil arcos, e só consegui exportar num pc com 16GB de RAM*
 
 O mapa final pode ser visto online aqui:
 <http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html>
@@ -290,3 +290,14 @@ Declives da rede viária de Lisboa (10m):
 > A mediana do declive das ruas de Lisboa é de 2.6%. 49% das vias são
 > planas ou quase planas (0-3%) e cerca de 72% das vias são
 > perfeitamente cicláveis (0-5%).
+
+## Mapas de declives, criados a partir deste script
+
+-   [Almada](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada.html)
+-   [Braga](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
+-   [Guarda](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGuarda.html)
+-   [Lisboa](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html)
+-   [Loures](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLoures.html)
+-   [Porto](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html)
+-   [Isle of Wight
+    (UK)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesIoW.html)
