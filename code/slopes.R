@@ -14,8 +14,8 @@ library(slopes)
 library(tmap)
 
 
-# ler shapefile
-RedeViaria = st_read("shapefiles/sentidos_link.shp")
+# ler shapefiles das Redes Viárias
+RedePorto = st_read("shapefiles/sentidos_link.shp")
 # Reading layer `sentidos_link' from data source `D:\GIS\Porto\sentidos_link.shp' using driver `ESRI Shapefile'
 # Simple feature collection with 19854 features and 6 fields
 # geometry type:  LINESTRING
@@ -23,16 +23,35 @@ RedeViaria = st_read("shapefiles/sentidos_link.shp")
 # bbox:           xmin: -966257.6 ymin: 5027255 xmax: -950956 ymax: 5034212
 
 #está em coodenadas esféricas, projectar em WGS84
-RedeViaria = st_transform(RedeViaria, 4326) 
-st_write(RedeViaria, "shapefiles/RedeViariaPorto_wgs84.gpkg") 
-class(RedeViaria)
+RedePorto = st_transform(RedePorto, 4326) 
+st_write(RedePorto, "shapefiles/RedeViariaPorto_wgs84.gpkg") 
+class(RedePorto)
+
+RedeLisboa = st_read("https://opendata.arcgis.com/datasets/a557c10e19a44f0e9592c7b63bae8d3b_0.geojson")
+summary(RedeLisboa$slope)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 0.000   1.308   2.985   4.361   5.779  92.500 
+
+#Escolher aqui qual se vai usar
+RedeViaria = RedePorto
+#RedeViaria = RedeLisboa
 
 #ler raster com altimetria
-DEM = raster("raster/PortoNASA_clip.tif")
-class(DEM)
-summary(values(DEM))
+DEMporto = raster("raster/PortoNASA_clip.tif") #com 27m de resolução
+class(DEMporto)
+res(DEMporto)
+summary(values(DEMporto))
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 # -10.00   24.00   72.00   65.87   97.00  178.00 
+
+DEMlisboa = raster("raster/lisbon_north_wgs84.tif") #com 12.8m de resolução
+class(DEMlisboa)
+res(DEMlisboa)
+summary(values(DEMlisboa))
+
+#Escolher aqui qual se vai usar
+DEM = DEMporto
+#DEM = DEMlisboa
 
 #visualizar
 raster::plot(DEM)
@@ -58,7 +77,9 @@ RedeViaria$declive_class =  RedeViaria$declive %>%
 round(prop.table(table(RedeViaria$declive_class))*100,1)
 # 0-3: plano       3-5: leve      5-8: médio  8-10: exigente 10-20: terrível >20: impossível 
 #   36.6            24.0            21.0             7.2            10.1             1.1 
-
+# stplnr!
+# 0-3: plano       3-5: leve      5-8: médio  8-10: exigente 10-20: terrível >20: impossível 
+# 34.4            24.0            21.4             7.7            10.8             1.7 
 
 
 #palete de cores
@@ -85,3 +106,5 @@ tmap_save(mapadeclives, "DeclivesPorto.html")
 
 #exportar shapefile com os declives, em formato GeoPackage (QGIS)
 #st_write(RedeViaria, "shapefiles/RedeViariaPorto_declives.gpkg", append=T)
+#exportar também em kml
+st_write(RedePorto, "RedePorto_osm_stplnr.kml")
