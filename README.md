@@ -301,3 +301,5 @@ Declives da rede viária de Lisboa (10m):
 -   [Porto](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html)
 -   [Isle of Wight
     (UK)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesIoW.html)
+-   [São Paulo
+    (BR)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesSaoPaulo.html)
