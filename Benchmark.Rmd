@@ -1,0 +1,244 @@
+---
+title: "Benchmark Elevation Sources"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Different elevation sources may bring better or worse results, when computing slopes for a road network.  
+In many cases, the resolution of raster digital elevation models (DEM) does not matter much, when we assume that they will be small enough for large segments - for instance, if we need to know the gradient of a 2km length highway, planned for motorized vehicles.  
+But when physical effort matters, such as for active travel (walking, cycling), a 50m road with a 2% gradient might be very different that an 8% gradient.  
+For smaller road segments, getting an accurate gradient value might be an issue, in particular when the free and open data sources do not provide a good resolution.  
+In this example, we will see and compare the results of [slopes R package](https://github.com/ITSLeeds/slopes) for the same road network sample (in Lisbon, Portugal), using three different elevation data sources, with different resolution.
+
+## Materials - Data sources
+Open data sources
+
+### For Elevation Models 
+
+* NASA Digital Elevation Model, with 27m cell resolution
+* MapBox-Terrain tiles, with 0.1 meter height increments (ref)
+* Instituto Superior Técnico Digital Elevation Model, with 10m cell resolution
+
+##### NASA DEM
+The SRTM NASA's mission 
+Os dados do SRTM (Shuttle Radar Topography Mission), uma missão da NASA, estão disponíveis gratuitamente, mas para uma resolução de 25 a 30m, com erro da altimetria vertical de 16m - saber mais. Para fazer donwload do tile correcto, pode-se também recorrer a um outro plugin do QGIS, o SRTM-Donwloader, e pedir para guardar o raster que cobre a shapefile da rede viária - é uma opção no QGIS.
+
+Como o raster cobre uma área bem maior do que necessitamos (ver ficheiro N38W010.hgt), podemos sempre fazer um clip para ficar com dimensões mais adequadas à nossa análise: Raster > Extraction > Clip Raster by Extent O ficheiro PortoNASA_clip.tif na pasta raster já foi cortado para uma área mais adequada à cidade de Lisboa.
+This extracted with QGIS SRTM Downloader plugin and clipped)
+
+
+##### MapBox tiles 
+Package ceramic https://github.com/hypertidy/ceramic
+
+https://docs.mapbox.com/help/troubleshooting/access-elevation-data/
+Requires an API key
+The slopes_3d() funcion from slopes packages retrives the z-values information for each vertice, storing an xy linestring as a xyz linestring.
+
+##### IST DEM
+This DEM was acquired by Instituto Superior Técnico (University of Lisbon) by 2012, covers all the Northen Metropolitan Area of Lisbon, and has a 10m cell resolution, when projected at the official Portuguese EPSG: 3763 - TM06/ETRS89. No more is known about this raster, and it has been used in several projects at CERIS Research Center.
+
+### For the road network
+A sample of Lisbon's Road Netwotk, available on OpenStreetMap.  
+After retrieving the data from "portugal" - the only dataset available at the moment for the case study -, we will make a buffer of 2000m around "Campo Martires Patria", right in the center of Lisbon, and collect a sample that contains variability regarding:  
+
+* types of highways, from large avenues to small stairs
+* orthogonal and organic highways or streets
+* flat and hilly highways
+* flat and hilly areas
+* long and short highways
+
+
+## Methods
+
+### To prerare the road netwotk
+```{r message=FALSE, warning=FALSE}
+#load packages
+library(dplyr)
+library(sf)
+library(osmextract)
+library(stplanr)
+library(slopes)
+library(raster)
+library(geodist)
+library(tmap)
+```
+
+1. Retrieve the OSM road network and filter by highway classes, removing pathways
+```{r eval=FALSE}
+portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE, quiet = FALSE, force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
+```
+```{r eval=FALSE}
+portugal_osm_filtered = portugal_osm %>%
+  dplyr::filter(
+    highway %in% c(
+      'primary',"primary_link",'secondary',"secondary_link",
+      'tertiary',"tertiary_link","trunk","trunk_link",
+      "motorway","motorway_link","service","track",
+      "residential","cycleway","living_street","pedestrian",
+      "steps", "unclassified"
+    )
+  )
+```
+```{r include=FALSE}
+# OSMpt = "https://github.com/U-Shift/Declives-RedeViaria/releases/download/0.3/portugal_osm_filtered.Rds"
+# portugal_osm_filtered = readRDS(url(u, "rb"))
+portugal_osm_filtered = readRDS("D:/GIS/OSM/portugal_osm_filtered.Rds")
+```
+
+3. Create a buffer area with 2km around a point in the center of Lisbon, and clip the road network with it
+```{r message=FALSE, warning=FALSE}
+#buffer area
+lisbon_sf = tmaptools::geocode_OSM("campo mártires da pátria", as.sf = TRUE)
+lisbon_buffer = stplanr::geo_buffer(shp = lisbon_sf, dist = 2000)
+#clip
+osm_lines_lisbon = st_crop(portugal_osm_filtered, lisbon_buffer) %>%  #clip by bounding box
+                    st_intersection(lisbon_buffer)
+```
+
+4. Clean the road netwok, by removing unconnected segments
+```{r message=FALSE, warning=FALSE}
+osm_lines_lisbon$group = stplanr::rnet_group(osm_lines_lisbon)
+plot(osm_lines_lisbon["group"])
+osm_lines_lisbon_clean = osm_lines_lisbon %>% filter(group == 1) #keep only the main network cluster
+
+# st_geometry(osm_lines_lisbon_clean) #geometry type:  GEOMETRY || it is required to be LINESTRING
+```
+5. Filter from the OSM original network, the segments in the clean one
+```{r}
+RoadNetwork = portugal_osm_filtered %>% filter(osm_id %in% osm_lines_lisbon_clean$osm_id) #ficar apenas os segmentos da rede limpa
+```
+
+6. Breaking up the road segments at their internal vertices, but leaving _brunels_ intact
+```{r message=TRUE, warning=TRUE}
+RoadNetwork = stplanr::rnet_breakup_vertices(RoadNetwork)
+nrow(RoadNetwork)
+```
+```{r eval=FALSE, include=FALSE}
+mapview::mapview(RoadNetwork)
+```
+
+
+### To estimate the slope of road network segments
+##### With NASA DEM
+1. Import the DEM and make sure the road network dataset has the same projection
+```{r}
+demNASA = raster::raster("raster/LisboaNASA_clip.tif")
+summary(values(demNASA))
+res(demNASA)
+raster::plot(demNASA)
+plot(sf::st_geometry(RoadNetwork), add = TRUE)
+```
+2. Estimate the gradient
+```{r}
+RoadNetworkNASA = RoadNetwork
+RoadNetworkNASA$slope = slope_raster(RoadNetworkNASA, e = demNASA)
+RoadNetworkNASA$slope_pct = RoadNetworkNASA$slope*100 #percentage
+```
+
+##### With Map Box
+1. Estimate the gradient, directly with `slopes`
+```{r warning=FALSE}
+RoadNetworkMBox = slope_3d(r= RoadNetwork)
+RoadNetworkMBox$slope = slope_xyz(RoadNetworkMBox)
+RoadNetworkMBox$slope_pct = RoadNetworkMBox$slope*100 #percentage
+```
+
+##### With IST DEM
+1. Import the DEM and make sure the road network dataset has the same projection
+```{r message=FALSE, warning=FALSE}
+demIST = raster::raster("raster/LisboaIST_clip_r1.tif")
+crs(demIST) = CRS('+init=EPSG:3763') #assign official projection (Portugal TM06/ETRS89)
+summary(values(demIST))
+res(demIST)
+
+RoadNetworkIST = st_transform(RoadNetwork, 3763) #to the same projection as demIST
+raster::plot(demIST)
+plot(sf::st_geometry(RoadNetworkIST), add = TRUE)
+```
+2. Estimate the gradient
+```{r}
+RoadNetworkIST$slope = slope_raster(RoadNetworkIST, e = demIST)
+RoadNetworkIST$slope_pct = RoadNetworkIST$slope*100 #percentage
+```
+
+
+## Results
+Compare the estimated values for each method
+```{r}
+summary(RoadNetworkNASA$slope_pct)
+summary(RoadNetworkMBox$slope_pct)
+summary(RoadNetworkIST$slope_pct)
+```
+
+
+Adopt a simplistic qualitative classification for cycling effort uphill, and compare the number of segments in each class
+```{r include=FALSE}
+RoadNetworkNASA$slope_class = RoadNetworkNASA$slope_pct %>%
+  cut(breaks = c(0, 3, 5, 8, 10, 20, Inf),
+    labels = c("0-3: flat", "3-5: mild", "5-8: medium", "8-10: hard", "10-20: extreme", ">20: impossible"),
+    right = F)
+RoadNetworkMBox$slope_class = RoadNetworkMBox$slope_pct %>%
+  cut(breaks = c(0, 3, 5, 8, 10, 20, Inf),
+    labels = c("0-3: flat", "3-5: mild", "5-8: medium", "8-10: hard", "10-20: extreme", ">20: impossible"),
+    right = F)
+RoadNetworkIST$slope_class = RoadNetworkIST$slope_pct %>%
+  cut(breaks = c(0, 3, 5, 8, 10, 20, Inf),
+    labels = c("0-3: flat", "3-5: mild", "5-8: medium", "8-10: hard", "10-20: extreme", ">20: impossible"),
+    right = F)
+
+```
+```{r}
+round(prop.table(table(RoadNetworkNASA$slope_class))*100,1) #NASA
+round(prop.table(table(RoadNetworkMBox$slope_class))*100,1) #Map Box
+round(prop.table(table(RoadNetworkIST$slope_class))*100,1) #IST
+```
+
+Plot maps side by side
+```{r include=FALSE}
+palredgreen = c("#267300", "#70A800", "#FFAA00", "#E60000", "#A80000", "#730000") #color palette
+tmap_mode("plot")
+slopesNASA = 
+  tm_layout(title = "DEM NASA 27m", legend.show = F) +
+  tm_shape(RoadNetworkNASA) +
+  tm_lines(
+    col = "slope_class",
+    palette = palredgreen, 
+    lwd = 1.8, 
+    title.col = "Gradient [%]"
+  )
+slopesMBox = 
+  tm_layout(title = "MapBox", legend.show = T, legend.position = c("right","bottom")) +
+  tm_shape(RoadNetworkMBox) +
+  tm_lines(
+    col = "slope_class",
+    palette = palredgreen, 
+    lwd = 1.8, 
+    title.col = "Gradient [%]"
+  )
+slopesIST = 
+  tm_layout(title = "DEM IST 10m", legend.show = F) +
+  tm_shape(RoadNetworkIST) +
+  tm_lines(
+    col = "slope_class",
+    palette = palredgreen, 
+    lwd = 1.8, 
+    title.col = "Gradient [%]"
+  )
+```
+
+
+```{r message=FALSE, warning=FALSE}
+tmap_arrange(slopesNASA, slopesMBox, slopesIST)
+```
+
+
+
+## Discussion
+
+
+## References
