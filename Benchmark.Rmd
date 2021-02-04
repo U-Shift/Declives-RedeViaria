@@ -49,7 +49,7 @@ Package ceramic https://github.com/hypertidy/ceramic
 
 https://docs.mapbox.com/help/troubleshooting/access-elevation-data/
 Requires an API key
-The slopes_3d() function from slopes packages retrieves the z-values information for each vertice, storing an xy linestring as a xyz linestring.
+The `slopes_3d()` function from slopes packages retrieves the z-values information for each vertice, storing an xy linestring as a xyz linestring.
 
 
 ##### Copernicus DEM
@@ -75,7 +75,7 @@ After retrieving the data from "portugal" - the only dataset available at the mo
 
 ### To prerare the road netwotk
 ```{r message=FALSE, warning=FALSE}
-#load packages
+#load required packages
 library(dplyr)
 library(sf)
 library(osmextract)
@@ -89,7 +89,8 @@ library(tmap)
 1. Retrieve the OSM road network and filter by highway classes, removing pathways
 
 ```{r eval=FALSE}
-portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE, quiet = FALSE, force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
+portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE,
+                      quiet = FALSE, force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
 ```
 ```{r eval=FALSE}
 portugal_osm_filtered = portugal_osm %>%
@@ -136,7 +137,7 @@ osm_lines_lisbon_clean = osm_lines_lisbon %>% filter(group == 1) #keep only the 
 RoadNetwork = portugal_osm_filtered %>% filter(osm_id %in% osm_lines_lisbon_clean$osm_id) #ficar apenas os segmentos da rede limpa
 ```
 
-5. Breaking up the road segments at their internal vertices, but leaving _brunels_ intact
+5. Breaking up the road segments at their internal vertices, but leaving _brunels_ (bridges and tunnels) intact 
 
 ```{r message=TRUE, warning=TRUE}
 RoadNetwork = stplanr::rnet_breakup_vertices(RoadNetwork)
@@ -154,7 +155,6 @@ mapview::mapview(RoadNetwork)
 
 ```{r}
 demNASA = raster::raster("raster/LisboaNASA_clip.tif")
-summary(values(demNASA))
 ```
 ```{r echo=FALSE}
 raster::plot(demNASA)
@@ -171,7 +171,8 @@ RoadNetworkNASA$slope_pct = RoadNetworkNASA$slope*100 #percentage
 
 ##### With Map Box
 
-* Estimate the gradient, directly with `slopes`
+* Estimate the gradient, directly with `slopes`  
+The `slopes_3d()` function from slopes packages retrieves the z-values information for each vertice, storing an xy linestring as a xyz linestring.
 
 ```{r warning=FALSE}
 RoadNetworkMBox = slope_3d(r= RoadNetwork)
@@ -249,6 +250,12 @@ t1 = rbind(summary(RoadNetworkNASA$slope_pct), summary(RoadNetworkMBox$slope_pct
            summary(RoadNetworkEU$slope_pct), summary(RoadNetworkIST$slope_pct))
 row.names(t1) = c("STRM NASA", "Ceramic MapBox", "EU-DEM Copernicus", "IST DEM")
 knitr::kable(t1, digits = 3, caption = "Result summaries")
+```
+
+```{r eval=FALSE, include=FALSE}
+df= as.data.frame(cbind(RoadNetworkNASA$slope_pct,RoadNetworkMBox$slope_pct,RoadNetworkIST$slope_pct)) #EU missing - 3 segments difference
+names(df)=c("STRM NASA", "Ceramic MapBox", "IST DEM")
+DataExplorer::plot_histogram(df, ncol = 2)
 ```
 
 

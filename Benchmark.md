@@ -68,7 +68,7 @@ This extracted with QGIS SRTM Downloader plugin and clipped)
 Package ceramic <https://github.com/hypertidy/ceramic>
 
 <https://docs.mapbox.com/help/troubleshooting/access-elevation-data/>
-Requires an API key The slopes\_3d() function from slopes packages
+Requires an API key The `slopes_3d()` function from slopes packages
 retrieves the z-values information for each vertice, storing an xy
 linestring as a xyz linestring.
 
@@ -107,7 +107,7 @@ collect a sample that contains variability regarding:
 ### To prerare the road netwotk
 
 ``` r
-#load packages
+#load required packages
 library(dplyr)
 library(sf)
 library(osmextract)
@@ -122,7 +122,8 @@ library(tmap)
     removing pathways
 
 ``` r
-portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE, quiet = FALSE, force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
+portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE,
+                      quiet = FALSE, force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
 ```
 
 ``` r
@@ -172,7 +173,7 @@ RoadNetwork = portugal_osm_filtered %>% filter(osm_id %in% osm_lines_lisbon_clea
 ```
 
 1.  Breaking up the road segments at their internal vertices, but
-    leaving *brunels* intact
+    leaving *brunels* (bridges and tunnels) intact
 
 ``` r
 RoadNetwork = stplanr::rnet_breakup_vertices(RoadNetwork)
@@ -190,11 +191,7 @@ nrow(RoadNetwork)
 
 ``` r
 demNASA = raster::raster("raster/LisboaNASA_clip.tif")
-summary(values(demNASA))
 ```
-
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##  -29.00   17.00   82.00   82.63  121.00  299.00
 
 ![](Benchmark_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
@@ -208,7 +205,10 @@ RoadNetworkNASA$slope_pct = RoadNetworkNASA$slope*100 #percentage
 
 ##### With Map Box
 
--   Estimate the gradient, directly with `slopes`
+-   Estimate the gradient, directly with `slopes`  
+    The `slopes_3d()` function from slopes packages retrieves the
+    z-values information for each vertice, storing an xy linestring as a
+    xyz linestring.
 
 ``` r
 RoadNetworkMBox = slope_3d(r= RoadNetwork)
@@ -300,7 +300,7 @@ class
 
 -   View maps side by side
 
-![](Benchmark_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->![](Benchmark_files/figure-gfm/unnamed-chunk-24-2.png)<!-- -->
+![](Benchmark_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->![](Benchmark_files/figure-gfm/unnamed-chunk-25-2.png)<!-- -->
 
 ## Discussion
 
