@@ -1,0 +1,17 @@
+<PAMDataset>
+  <Metadata>
+    <MDI key="DataType">Elevation</MDI>
+  </Metadata>
+  <PAMRasterBand band="1">
+    <Description>Band_1</Description>
+    <Metadata>
+      <MDI key="BandName">Band_1</MDI>
+      <MDI key="RepresentationType">ATHEMATIC</MDI>
+      <MDI key="STATISTICS_MAXIMUM">283.01803588867</MDI>
+      <MDI key="STATISTICS_MEAN">85.473022181853</MDI>
+      <MDI key="STATISTICS_MINIMUM">-0.37667798995972</MDI>
+      <MDI key="STATISTICS_STDDEV">44.964519526224</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">78.89</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
