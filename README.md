@@ -54,7 +54,7 @@ Estes raster são difíceis de obter gratuitamente para resoluções
 melhores. Para o caso de uma Rede Viária, seria bom ter um raster com
 células de 10metros ou menos.
 
-Os dados do SRTM (*Shuttle Radar Topography Mission*), uma missão da
+Os dados do **SRTM** (*Shuttle Radar Topography Mission*), uma missão da
 NASA, estão [disponíveis
 gratuitamente](https://gisgeography.com/srtm-shuttle-radar-topography-mission/),
 mas para uma resolução de 25 a 30m, com erro da altimetria vertical de
@@ -64,12 +64,29 @@ do *tile* correcto, pode-se também recorrer a um outro plugin do QGIS, o
 pedir para guardar o raster que cobre a shapefile da rede viária - é uma
 opção no QGIS.
 
+Em alternativa, a **COPERNICUS**, uma missão da ESA, também
+[disponibiliza
+gratuitamente](https://land.copernicus.eu/imagery-in-situ/eu-dem) os DEM
+para toda a Europa, e com uma resolução de 25, com erro da altimetria
+vertical de 7m - [saber
+mais](https://land.copernicus.eu/user-corner/publications/eu-dem-flyer/view).
+Trata-se de um produto que é baseado no SRTM e no ASTER GDEM, com uma
+abordagem de ponderação de pesos. A sua versão anterior (1.0)
+apresentava uma precisão média de 2.9m verticais, quando foi validada.  
+Para escolher o *tile* correcto, pode-se [navegar no
+mapa](https://land.copernicus.eu/imagery-in-situ/eu-dem/eu-dem-v1.1), e
+seleccionar os ficheiros. Para fazer download é necessário fazer login
+([registo gratuito](https://land.copernicus.eu/@@register)).
+
+> Neste caso, é necessário re-projectar a rede viária no sistema de
+> coordenadas do DEM: `EPGS-3035` para ETRS89-LAEA.
+
 Como o raster cobre uma área bem maior do que necessitamos (ver ficheiro
 `N41W009.hgt`), podemos sempre fazer um *clip* para ficar com dimensões
 mais adequadas à nossa análise:
-`Raster > Extraction > Clip Raster by Extent` O ficheiro
-`PortoNASA_clip.tif` na pasta `raster` já foi cortado para uma área mais
-adequada à cidade do Porto.
+`Raster > Extraction > Clip Raster by Extent`.  
+O ficheiro `PortoNASA_clip.tif` ou `PortoCOPERNICUS_clip.tif` na pasta
+`raster` já foi cortado para uma área mais adequada à cidade do Porto.
 
 ## Cálculo dos Declives
 
@@ -140,6 +157,8 @@ de 27.7m
 
 #### visualizar
 
+O DEM e a Rede Vuária têm de estar no mesmo sistema de coordenadas.
+
 ``` r
 raster::plot(DEM)
 plot(sf::st_geometry(RedeViaria), add = TRUE)
@@ -156,8 +175,6 @@ Ler mais na página do package sobre como são calculados.
 ``` r
 RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #28 segundos
 ```
-
-    ## [1] FALSE
 
 Declives em percentagem: *mínimo, P25, mediana, média, P75, max*.
 
@@ -198,7 +215,18 @@ round(prop.table(table(RedeViaria$declive_class))*100,1)
 … o que quer dizer que 34.3% das ruas são planas ou quase planas, e
 cerca de 58% são perfeitamente cicláveis.
 
-Pode-se agora exportar novamente o shapefile
+> Ao usarmos o DEM europeu
+> ([Copernicus](raster/PortoCOPERNICUS_clip.tif)) os resultados são
+> diferentes: 50.9% das vias são planas ou quase planas (0-3%) e cerca
+> de 72% das vias são perfeitamente cicláveis (0-5%). Experimenta!
+
+Pode-se agora calcular a extensão das ruas
+
+``` r
+RedeViaria$length = st_length(RedeViaria)
+```
+
+e exportar novamente o shapefile
 
 ``` r
 #exportar shapefile com os declives, em formato GeoPackage (QGIS)
@@ -231,7 +259,8 @@ tm_shape(RedeViaria) +
     palette = palredgreen, #palete de cores
     lwd = 2, #espessura das linhas
     title.col = "Declive [%]",
-    popup.vars = c("Tipo :" = "highway",
+    popup.vars = c("Tipo: " = "highway",
+                   "Comprimento" = "length",
                    "Declive: " = "declive",
                    "Classe: " = "declive_class"),
     popup.format = list(digits = 1),
@@ -241,12 +270,12 @@ tm_shape(RedeViaria) +
 mapadeclives
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 #### Gravar em html
 
 ``` r
-tmap_save(mapadeclives, "DeclivesPorto.html")
+tmap_save(mapadeclives, "DeclivesPorto_SRTM.html")
 ```
 
 *Dependendo do tamanho da rede, pode ser exigente para a RAM. Esta tinha
@@ -298,7 +327,10 @@ Declives da rede viária de Lisboa (10m):
 -   [Guarda](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGuarda.html)
 -   [Lisboa](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html)
 -   [Loures](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLoures.html)
--   [Porto](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto.html)
+-   [Porto
+    (NASA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_SRTM.html)
+    \| [Porto
+    (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_EU.html)
 -   [Isle of Wight
     (UK)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesIoW.html)
 -   [São Paulo
