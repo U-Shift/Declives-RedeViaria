@@ -322,7 +322,10 @@ Declives da rede viária de Lisboa (10m):
 
 ## Mapas de declives, criados a partir deste script
 
--   [Almada](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada.html)
+-   [Almada
+    (NASA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_SRTM.html)
+    \| [Almada
+    (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_EU.html)
 -   [Braga](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
 -   [Guarda](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGuarda.html)
 -   [Lisboa](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html)
