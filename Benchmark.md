@@ -36,9 +36,18 @@ comparison of the available topographic data, regarding its resolution
 and coverage. Unfortunately, the open ones, with a good resolution, only
 cover USA and New Zeland.
 
+### Como são calcuados os declives nos DEM?
+
+A sua qualidade, resolução, etc, é suficiente para aproximar ao real
+
+Nos datasets abertos, nem sempre dizem como o declive foi calculado.
+
+### Problema da escala da informação geográfica para os modos ativos (ruas)
+
 ## Materials - Data sources
 
-Open data sources.
+Open data sources.  
+Road Network: OpenstreetMap…
 
 ### For Elevation Models
 
@@ -46,6 +55,7 @@ For this example, we will use and compare four elevation sources:
 
 -   NASA Digital Elevation Model, with 27m cell resolution
 -   MapBox-Terrain tiles, with 0.1 meter height increments (ref)
+-   Google Elevation
 -   Copernicus European DEM, with 25m cell resolution
 -   Instituto Superior Técnico Digital Elevation Model, with 10m cell
     resolution
@@ -72,6 +82,10 @@ Requires an API key The `slopes_3d()` function from slopes packages
 retrieves the z-values information for each vertice, storing an xy
 linestring as a xyz linestring.
 
+##### Google Elevation
+
+Varia de local para local. Em Lisboa a resolução é de 1.92m (dizem).
+
 ##### Copernicus DEM
 
 The European Land Monitoring Service ([“EU-DEM V1.1”
@@ -86,7 +100,9 @@ This DEM was acquired by Instituto Superior Técnico (University of
 Lisbon) by 2012, covers all the Northern Metropolitan Area of Lisbon,
 and has a 10m cell resolution, when projected at the official Portuguese
 EPSG: 3763 - TM06/ETRS89. No more is known about this raster, and it has
-been used in several projects at CERIS Research Center.
+been used in several projects at CERIS Research Center. Modelo de Helena
+Rua das Linhas de Torres Vedras: digitalizou-se as curvas de nível e
+converteu-se para raster.
 
 ### For the road network
 
@@ -285,6 +301,8 @@ DEM information for the area
 
 Result summaries
 
+![](Benchmark_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
 -   Adopt a simplistic qualitative classification for cycling effort
     uphill, and compare the number of segments in each class
 
@@ -302,9 +320,36 @@ class
 
 ![](Benchmark_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->![](Benchmark_files/figure-gfm/unnamed-chunk-25-2.png)<!-- -->
 
+### Comparação
+
+Que estatísticas usar?  
+Ver ONDE variam mais, se é nas zonas planas, ou nas zonas sinuosas, ou
+nas ruas orgânicas/ortogonaisl…  
+Padrões de variação
+
 ## Discussion
 
 *Google Elevation data will also be compared.*
+
+Qual a metodologia recomendada?  
+Qual o intervalo de **“resolução”**, ou de **copmrimento de segmentos**,
+ou **outro indicador**, recomendado para o cálculo de declives para
+modos ativos?
+
+Isto é mais orientado para que bike route planners sejam mais fiáveis
+para dar uma melhor experiência ao ciclista (ao contrário de uma má e
+desmotivadora experiência?)
+
+### Validação
+
+Com uma amostra de algumas ruas em Lisboa em que iremos medir com
+instrumentos de topografia  
+**OU** com carotografia disponível da CML, 1:1000, com vários pontos
+cotados.
+
+#### Variação dentro do próprio segmento
+
+Cruzar com a validação dos pontos cotados da CML.
 
 ## References
 
