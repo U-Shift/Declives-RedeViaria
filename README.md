@@ -113,10 +113,10 @@ RedeViaria = st_read("shapefiles/RedeViariaPorto_osm.shp")
 
     ## Reading layer `RedeViariaPorto_osm' from data source `D:\GIS\Declives-RedeViaria\shapefiles\RedeViariaPorto_osm.shp' using driver `ESRI Shapefile'
     ## Simple feature collection with 13738 features and 9 fields
-    ## geometry type:  LINESTRING
-    ## dimension:      XY
-    ## bbox:           xmin: -8.694169 ymin: 41.12601 xmax: -8.547498 ymax: 41.19294
-    ## geographic CRS: WGS 84
+    ## Geometry type: LINESTRING
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -8.694169 ymin: 41.12601 xmax: -8.547498 ymax: 41.19294
+    ## Geodetic CRS:  WGS 84
 
 ``` r
 # RedeViaria = st_transform(RedeViaria, 4326) #projectar em WGS84
@@ -326,7 +326,10 @@ Declives da rede viária de Lisboa (10m):
     (NASA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_SRTM.html)
     \| [Almada
     (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_EU.html)
--   [Braga](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
+-   [Braga
+    (NASA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
+    \| [Braga
+    (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga_EU.html)
 -   [Guarda](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGuarda.html)
 -   [Lisboa](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html)
 -   [Loures](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLoures.html)
