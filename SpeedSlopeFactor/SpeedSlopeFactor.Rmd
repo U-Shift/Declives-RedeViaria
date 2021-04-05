@@ -1,13 +1,26 @@
 ---
 title: "Speed-Slope factor"
 author: "Rosa Félix"
-output: github_document
+output:
+  html_document:
+    fig_caption: yes
+    keep_tex: yes
+# output:
+#   github_document:
+#     pandoc_args: "--webtex"
 bibliography: refs.bib
 link-citations: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+#import libraries
+library(tidyverse)
+library(sf)
+library(slopes)
 ```
 
 ## Cost for bicycle routing models
@@ -22,7 +35,7 @@ GIS allows modeling a road network in the form of a topological graph, to which 
 
 For a **constant** urban cycling speed travel (*factor = 1*), let's say 15 km/h, we assume that the speed is linear to the edge extension, and its cost is its travel time.
 
-$$ c_{speed} = \frac{length_{[m]}}{speed_{[m/s]}} = time_{[s]}\tag1$$
+$$ c_{speed} = \frac{length_{[m]}}{speed_{[m/s]}} = time_{[s]}\tag{Eq.1}$$
 
 Many factors may be determinant for **cycling speed**, such the surface conditions, traffic, weather, mass, type of bicycle, directness, confidence, etc [@hochmair2007; @Felix2012; @broach2012; @broach2016]. Here we will look only to **speed related with gradient**, from the perspective of a common urban cyclist.
 
@@ -44,23 +57,182 @@ Sometimes it is more efficient to travel a longer distance with less steep gradi
 
 Very steep roads are a problem not only for uphill riding, but also for downhill riding, because a mechanical failure in the brakes can lead to a dangerous situation for the rider, who also has to expend some effort and skill to keep the bike balanced and control the additional risk.
 
-[![World's steepest street, with a 35% incline for over 161 meters. Baldwin Street, Dunedin, New Zealand (Photo: Wikipedia)](https://upload.wikimedia.org/wikipedia/commons/b/b8/DunedinBaldwinStreet_Parked_Car.jpg)](https://en.wikipedia.org/wiki/Baldwin_Street)
+![Fig. 2 - World's steepest street, with a 35% incline for over 161 meters. Baldwin Street, Dunedin, New Zealand (Photo: Wikipedia)](https://upload.wikimedia.org/wikipedia/commons/b/b8/DunedinBaldwinStreet_Parked_Car.jpg){width="500" align="center}
 
 Downhill edges mostly result in benefit to the cyclist, increasing its speed. However, this is not linear, decreasing from slope values above 13%, and may even slow down the speed (relative to the average flat speed) it too steep.
 
-## Speed Slope Factor
+## Speed-Slope Factor
 
-After an iterative process, which considered the cyclist effort as a function of slope abacuses suggested by @ceap-centrodeestudosdearquitecturapaisagista, @aashto1999 and @austroads2009, p. 41 and also a cost formula developed by @price2008, a function models the slope factor based on the slope and length of each roadway segment.This function, which is non-symmetric and non-monotonic, reproduces the essential characteristics of the slope/effort relationship.
+After an iterative process, which considered the cyclist effort as a function of slope abacuses suggested by @aashto1999 and @austroads2009, p. 41 and also a cost formula developed by @price2008, Eq. 2 presets a function that models the slope factor based on the slope [%] and length [m] of each road segment. This function, which is non-symmetric and non-monotonic, reproduces the essential characteristics of the slope/effort relationship.
 
-$$f(d,l) = 1 \tag2
-$$
+In addition to this function, a second set of criteria is applied (*g*), which increases the *slope factor* when road segments have a given length [m] and slope [%], with intervals as suggested by @ceap-centrodeestudosdearquitecturapaisagista . Eq.3 shows that edges with gradient between 0 and 20 in the upward direction are thus penalized by accumulation of effort.
 
-You can also embed plots, for example:
+$$slope factor_{(slope,length)} = \begin{cases} 1.5 &\Leftarrow \quad slope <-30 \\
+1+ 2\frac{0.7}{13} * slope +\frac{0.7}{13^2}*slope^2 &\Leftarrow -30 \leq slope <0 \\
+1+ (\frac{slope}{g_{(slope, length)}})^2 &\Leftarrow 0 \leq slope \leq20 \\
+10 &\Leftarrow 20 <slope 
+\end{cases}\tag{Eq.2} $$
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+With,
+
+$$g_{(slope,length)} = \begin{cases} 4 &\Leftarrow 10<slope \leq 13 \quad\wedge\quad  length > 15\\
+4.5 &\Leftarrow 8 <slope \leq 10 \quad\wedge\quad  length > 30 \\
+5 &\Leftarrow 5 <slope \leq 8 \quad\wedge\quad  length > 60 \\
+6 &\Leftarrow 3 <slope \leq 5 \quad\wedge\quad  length > 120 \\
+7 &\Leftarrow otherwise 
+\end{cases}\tag{Eq.3} $$
+
+As the max penalization going uphill should not be 10 times more than the flat speed, we add another condition to maximize the **slope factor**, as follows:
+
+$$slope factor_{(slope,length)}adjst = \begin{cases} 
+10 &\Leftarrow slope >13 \quad\wedge\quad  length >15 \\
+10 &\Leftarrow slope >10 \quad\wedge\quad  length >30 \\
+10 &\Leftarrow slope >8 \quad\wedge\quad  length >60 \\
+10 &\Leftarrow slope >5 \quad\wedge\quad  length >120 \\
+\end{cases}\tag{Eq.4} $$
+
+<!-- $$slopefactor_{(slope,length)} > 10 \Rightarrow slope factor_{(slope,length)}adjst = 10 \tag{Eq.4} $$-->
+
+```{r include=FALSE}
+#g function
+g = function(slope, length){
+  ifelse((slope > 3 & slope <= 5 & length > 120), 6, 
+    ifelse((slope > 5 & slope <= 8 & length > 60), 5, 
+      ifelse((slope > 8 & slope <= 10 & length > 30), 4.5,
+        ifelse((slope > 10 & slope <= 13 & length > 15), 4,
+               7))))
+}
+#slope-factor function
+speedfactor = function(slope, length, g) {
+  ifelse(ifelse((slope < -30),1.5,
+        ifelse(slope < 0, 1 + (0.7 / 13) * 2 * slope + 0.7 / (13 ^ 2) * slope ^ 2,
+           ifelse((slope > 20), 10,
+              ifelse((slope >= 0 & slope <= 20), 1 + (slope / g) ^ 2,
+                  NA)))) >10, 10,
+      ifelse((slope < -30),1.5,
+        ifelse(slope < 0, 1 + (0.7 / 13) * 2 * slope + 0.7 / (13 ^ 2) * slope ^ 2,
+           ifelse((slope > 20), 10,
+              ifelse((slope >= 0 & slope <= 20), 1 + (slope / g) ^ 2,
+                  NA)))))
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+This functions result in a speed factor (in *log* scale) that varies as this:
+
+```{r echo=FALSE}
+curve(
+  expr = speedfactor(slope = x, g = 7, length = 120),
+  from = -35, to = 25, col = "blue", lwd = 3, log = "y",
+  xlab = "slope [%]", ylab = "slope factor")
+curve(
+  expr = speedfactor(slope = x, g = 4, length = 120),
+  from = 10, to = 25, col = "purple", lwd = 2, lty = 5, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 4.5, length = 120),
+  from = 8, to = 25, col = "grey", lwd = 2, lty = 4, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 5, length = 120),
+  from = 5, to = 25, col = "orange", lwd = 2, lty = 3, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 6, length = 120),
+  from = 3, to = 25, col = "red", lwd = 2, lty = 2, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 7, length = 120),
+  from = -35, to = 25, col = "blue", lwd = 2, log = "y", add = T)
+abline(h = 1, v = 0, lty = 3)
+title(main = "Slope-Speed function")
+legend(-30, 9,
+  legend = c(
+    "speed factor (base)",
+    "slope >3%, length >120 m",
+    "slope >5%, length >60 m",
+    "slope >8%, length >30 m",
+    "slope >10%, length >15 m"),
+  col = c("blue", "red", "orange", "grey", "purple"),
+  lty = 1:5, cex = 0.9, lwd = c(3, 2, 2, 2, 2), box.lty = 0)
+```
+
+And, finally, we divide the constant flat speed by the *slope factor* as :
+
+$$
+speed = \frac{speed_{flat}}{slope factor}\tag{Eq.5}
+$$
+
+```{r eval=FALSE, include=FALSE}
+speed = speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+### What does it means uphill?
+
+When going **uphill**, speed will reduce, and longer the road segments, higher the denominator, and slower the cyclist speed.
+
+For instance, if assuming a constant flat speed of 15 km/h and a road with 80 m and 3% uphill, a cyclist will reduce to 12.67 km/h
+
+```{r}
+speedflat = 15
+slope = 3
+length = 50
+speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+If it is slightly steeper, with 4% uphill, a cyclist will reduce to 11.31 km/h
+
+```{r}
+slope = 4
+length = 50
+speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+If that same segment is longer, a cyclist will reduce to 10.38 km/h
+
+```{r}
+slope = 4
+length = 150
+speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+For higher gradients, the speed decreases with more sensitivity regarding the segment length.
+
+```{r}
+slope = 6
+length = 60
+speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+```{r}
+slope = 6
+length = 80
+speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+And for very steep streets, cycling speed may reduce to walking speed.
+
+```{r}
+slope = 9
+length = 40
+speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+### And downhill?
+
+In another hand, when going **downhill**, speeds will increase until it gets 3.33 times faster, when the gradient is 13%. For steeper gradients, the cyclist will tend to break, and the speed will be lower.
+
+Until the moment when it gets so scary to ride it (again, for a regular urban cyclist with mild experience), that it will take more time to travel that road than if it was flat.
+
+```{r}
+length = 100
+slope = -8
+speedflat / speedfactor(slope, length, g = g(slope, length))
+slope = -13
+speedflat / speedfactor(slope, length, g = g(slope, length))
+slope = -20
+speedflat / speedfactor(slope, length, g = g(slope, length))
+slope = -25
+speedflat / speedfactor(slope, length, g = g(slope, length))
+slope = -30
+speedflat / speedfactor(slope, length, g = g(slope, length))
+```
+
+## Case Study
 
 ## References
