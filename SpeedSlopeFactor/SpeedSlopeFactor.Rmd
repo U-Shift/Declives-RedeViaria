@@ -74,7 +74,7 @@ Downhill edges mostly result in benefit to the cyclist, increasing its speed. Ho
 
 ## Speed-Slope Factor
 
-After an iterative process, which considered the cyclist effort as a function of slope abacuses suggested by @aashto1999 and @austroads2009, p. 41 and also a cost formula developed by @price2008, Eq. 2 presets a function that models the slope factor based on the slope [%] and length [m] of each road segment. This function, which is non-symmetric and non-monotonic, reproduces the essential characteristics of the slope/effort relationship.
+After an iterative process, which considered the cyclist effort as a function of slope abacuses suggested by @aashto1999 and @austroads2009 (p. 41), and also a cost formula developed by @price2008, Eq. 2 presets a function that models the slope factor based on the slope [%] and length [m] of each road segment. This function, which is non-symmetric and non-monotonic, reproduces the essential characteristics of the slope/effort relationship.
 
 In addition to this function, a second set of criteria is applied (*g*), which increases the *slope factor* when road segments have a given length [m] and slope [%], with intervals as suggested by @ceap-centrodeestudosdearquitecturapaisagista . Eq.3 shows that edges with gradient between 0 and 20 in the upward direction are thus penalized by accumulation of effort.
 
@@ -290,14 +290,16 @@ DATA$speedfactor = spf
 
 
 #set speed
-speed = 16 #set here in km/h (convert to m/s: speed/3.6)
+speedflat = 16 #set here in km/h (convert to m/s: speed/3.6)
 
-DATA$speed = speed / DATA$speedfactor
+DATA$speed = speedflat / DATA$speedfactor
 DATA$time = length / DATA$speed*3.6
 
 mapview::mapview(DATA["speed"])
 mapview::mapview(DATA["time"])
 
 ```
+
+This is a work in progress. **Suggestions and comments are welcome**! :) [github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor](https://github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor)
 
 ## References
