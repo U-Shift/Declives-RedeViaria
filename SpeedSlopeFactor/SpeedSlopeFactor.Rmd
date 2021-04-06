@@ -1,6 +1,7 @@
 ---
 title: "Speed-Slope factor"
 author: "Rosa Félix"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     fig_caption: yes
@@ -21,6 +22,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(sf)
 library(slopes)
+library(tmap)
+library(mapview)
 ```
 
 ## Cost for bicycle routing models
@@ -47,6 +50,14 @@ It is also known, by the gravity laws, that an object traveling at a constant sp
 
 The slope enters the cost function as a proxy for cyclist effort - the amount of energy a cyclist must expend to travel on a street with a given slope - causing the traversing time to increase for uphill routes. On downhill routes, the effort is reduced and the theoretical speed is increased, reducing their traversing time.
 
+@scott2020 designed an experiment for hiking, and applied a rule saying "*A 10% grade incline cuts your speed in half"**.*** In their results, they suggested an equation to calculate uphill speed (for hiking):
+
+$$
+speed = speed_{flat} * e^{(-0.04*slope)}\tag{Eq.2}
+$$
+
+Which results that with a grade of 20%, one can walk at a speed of 1.78 km/h it her horizontal speed was 4 km/h. When applying to cycling, for a flat speed of 15km/h, the same incline would be ride at a 6.74 km/h speed, which is not reliable for a standard cyclist.
+
 Also, the extension of the road segment enters in the cost function: for longer segments at a given gradient, the effort of the cyclist is higher than for a shorter segment with the same gradient.
 
 Figure 1 shows the maximum lengths of uphill gradient acceptable to cyclists [@austroads2009]. It considers that over a 3% slope, the length should be taken into account.
@@ -57,7 +68,7 @@ Sometimes it is more efficient to travel a longer distance with less steep gradi
 
 Very steep roads are a problem not only for uphill riding, but also for downhill riding, because a mechanical failure in the brakes can lead to a dangerous situation for the rider, who also has to expend some effort and skill to keep the bike balanced and control the additional risk.
 
-![Fig. 2 - World's steepest street, with a 35% incline for over 161 meters. Baldwin Street, Dunedin, New Zealand (Photo: Wikipedia)](https://upload.wikimedia.org/wikipedia/commons/b/b8/DunedinBaldwinStreet_Parked_Car.jpg){width="500" align="center}
+![Fig. 2 - World's steepest street, with a 35% incline for over 161 meters. Baldwin Street, Dunedin, New Zealand (Photo: Wikipedia)](https://upload.wikimedia.org/wikipedia/commons/b/b8/DunedinBaldwinStreet_Parked_Car.jpg){width="500" align="\"center"}
 
 Downhill edges mostly result in benefit to the cyclist, increasing its speed. However, this is not linear, decreasing from slope values above 13%, and may even slow down the speed (relative to the average flat speed) it too steep.
 
@@ -234,5 +245,59 @@ speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
 ## Case Study
+
+```{r}
+#use example from slopes()
+DATA = slopes::lisbon_road_segments
+DATA$slope = slope_raster(DATA, e = dem_lisbon_raster)
+DATA$slope = 100*DATA$slope
+DATA$slope_class = DATA$slope %>% 
+  cut(
+    breaks = c(0, 3, 5, 8, 10, 20, Inf),
+    labels = c("0-3: flat", "3-5: mild", "5-8: medium", "8-10: hard", "10-20: extreme", ">20: impossible"),
+    right = F
+  )
+palredgreen = c("#267300", "#70A800", "#FFAA00", "#E60000", "#A80000", "#730000")
+tmap_mode("view")
+tm_shape(DATA) +
+  tm_lines(
+    col = "slope_class",
+    palette = palredgreen, #palete de cores
+    lwd = 2,
+    id = "slope") #espessura das linhas
+    
+
+DATA$length = st_length(DATA)
+
+
+#assign a direction of slope, for the purpose of the example
+DATA$direction = "FT"
+DATA$direction[(DATA$z0 - DATA$z1) < 0] = "TF"
+
+mapviewOptions(fgb = FALSE)
+mapview::mapview(DATA["direction"],  selfcontained=TRUE)
+
+DATA$slope[DATA$direction == "TF"] = -(DATA$slope[DATA$direction == "TF"])
+slope = DATA$slope
+length = units::drop_units(DATA$length)
+g = g(slope, length)
+
+spf = speedfactor(slope, length, g)
+
+plot(spf, log="y")
+abline(h = 1, lty = 3)
+DATA$speedfactor = spf
+
+
+#set speed
+speed = 16 #set here in km/h (convert to m/s: speed/3.6)
+
+DATA$speed = speed / DATA$speedfactor
+DATA$time = length / DATA$speed*3.6
+
+mapview::mapview(DATA["speed"])
+mapview::mapview(DATA["time"])
+
+```
 
 ## References
