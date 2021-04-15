@@ -6,6 +6,11 @@ output:
   html_document:
     fig_caption: yes
     keep_tex: yes
+    toc: yes
+    toc_float: yes
+    toc_depth: 3
+    number_sections: true
+    code_download: true
 # output:
 #   github_document:
 #     pandoc_args: "--webtex"
@@ -26,7 +31,7 @@ library(tmap)
 library(mapview)
 ```
 
-## Cost for bicycle routing models
+# Cost for bicycle routing models
 
 Bicycle routing models add to car routing modeling a greater complexity that results essentially from the greater number of degrees of freedom associated with cycling (i.e., a smaller, lighter and more versatile vehicle in terms of maneuvering) and the fact that it is human powered and therefore depending on a limited energy, thus depending on the effort that is transmitted by the cyclist himself. This results in a series of specific peculiarities in its riding, namely: a greater number of variables relevant to the routing cost function, and the existence of more subjective variables.
 
@@ -34,7 +39,7 @@ A complexity involved in modeling route choice for cyclists represents a challen
 
 GIS allows modeling a road network in the form of a topological graph, to which a series of functions and algorithms, including the least cost path [@dijkstra1959]. The application of the least cost path algorithm assumes the existence of a graph formed by a set of set of edges and nodes. The edges can be oriented or not and, to these, a travel cost is associated, with one or more parameters, never less than zero. Associating a travel cost to each arc in the network, the route cost is defined as the sum of the costs of the arcs that compose it.
 
-### Speed
+## Speed
 
 For a **constant** urban cycling speed travel (*factor = 1*), let's say 15 km/h, we assume that the speed is linear to the edge extension, and its cost is its travel time.
 
@@ -42,7 +47,7 @@ $$ c_{speed} = \frac{length_{[m]}}{speed_{[m/s]}} = time_{[s]}\tag{Eq.1}$$
 
 Many factors may be determinant for **cycling speed**, such the surface conditions, traffic, weather, mass, type of bicycle, directness, confidence, etc [@hochmair2007; @Felix2012; @broach2012; @broach2016]. Here we will look only to **speed related with gradient**, from the perspective of a common urban cyclist.
 
-### Slope or gradient
+## Slope or gradient
 
 When comes to cycling, the route gradient can be a determinant variable to chose a route instead of an alternative. It is commonly known that cyclists are averse to roads with an ascending gradient, and that cyclists prefer roads with a descending gradient. The **direction** of the gradient is determinant.
 
@@ -72,17 +77,17 @@ Very steep roads are a problem not only for uphill riding, but also for downhill
 
 Downhill edges mostly result in benefit to the cyclist, increasing its speed. However, this is not linear, decreasing from slope values above 13%, and may even slow down the speed (relative to the average flat speed) it too steep.
 
-## Speed-Slope Factor
+# Speed-Slope Factor
 
-After an iterative process, which considered the cyclist effort as a function of slope abacuses suggested by @aashto1999 and @austroads2009 (p. 41), and also a cost formula developed by @price2008, Eq. 2 presets a function that models the slope factor based on the slope [%] and length [m] of each road segment. This function, which is non-symmetric and non-monotonic, reproduces the essential characteristics of the slope/effort relationship.
+After an iterative process, which considered the cyclist effort as a function of slope abacuses suggested by @aashto1999 and @austroads2009 (p. 41), and also a cost formula developed by @price2008, Eq. 3 presets a function that models the slope factor based on the slope [%] and length [m] of each road segment. This function, which is non-symmetric and non-monotonic, reproduces the essential characteristics of the slope/effort relationship.
 
-In addition to this function, a second set of criteria is applied (*g*), which increases the *slope factor* when road segments have a given length [m] and slope [%], with intervals as suggested by @ceap-centrodeestudosdearquitecturapaisagista . Eq.3 shows that edges with gradient between 0 and 20 in the upward direction are thus penalized by accumulation of effort.
+In addition to this function, a second set of criteria is applied (*g*), which increases the *slope factor* when road segments have a given length [m] and slope [%], with intervals as suggested by @ceap-centrodeestudosdearquitecturapaisagista . Eq. 4 shows that edges with gradient between 0 and 20 in the upward direction are thus penalized by accumulation of effort.
 
 $$slope factor_{(slope,length)} = \begin{cases} 1.5 &\Leftarrow \quad slope <-30 \\
 1+ 2\frac{0.7}{13} * slope +\frac{0.7}{13^2}*slope^2 &\Leftarrow -30 \leq slope <0 \\
 1+ (\frac{slope}{g_{(slope, length)}})^2 &\Leftarrow 0 \leq slope \leq20 \\
 10 &\Leftarrow 20 <slope 
-\end{cases}\tag{Eq.2} $$
+\end{cases}\tag{Eq.3} $$
 
 With,
 
@@ -91,7 +96,7 @@ $$g_{(slope,length)} = \begin{cases} 4 &\Leftarrow 10<slope \leq 13 \quad\wedge\
 5 &\Leftarrow 5 <slope \leq 8 \quad\wedge\quad  length > 60 \\
 6 &\Leftarrow 3 <slope \leq 5 \quad\wedge\quad  length > 120 \\
 7 &\Leftarrow otherwise 
-\end{cases}\tag{Eq.3} $$
+\end{cases}\tag{Eq.4} $$
 
 As the max penalization going uphill should not be 10 times more than the flat speed, we add another condition to maximize the **slope factor**, as follows:
 
@@ -100,7 +105,7 @@ $$slope factor_{(slope,length)}adjst = \begin{cases}
 10 &\Leftarrow slope >10 \quad\wedge\quad  length >30 \\
 10 &\Leftarrow slope >8 \quad\wedge\quad  length >60 \\
 10 &\Leftarrow slope >5 \quad\wedge\quad  length >120 \\
-\end{cases}\tag{Eq.4} $$
+\end{cases}\tag{Eq.5} $$
 
 <!-- $$slopefactor_{(slope,length)} > 10 \Rightarrow slope factor_{(slope,length)}adjst = 10 \tag{Eq.4} $$-->
 
@@ -126,6 +131,7 @@ speedfactor = function(slope, length, g) {
               ifelse((slope >= 0 & slope <= 20), 1 + (slope / g) ^ 2,
                   NA)))))
 }
+#There is probably a way to write this code cleaner...
 ```
 
 This functions result in a speed factor (in *log* scale) that varies as this:
@@ -173,7 +179,7 @@ $$
 speed = speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
-### What does it means uphill?
+## What does it means uphill?
 
 When going **uphill**, speed will reduce, and longer the road segments, higher the denominator, and slower the cyclist speed.
 
@@ -186,7 +192,7 @@ length = 50
 speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
-If it is slightly steeper, with 4% uphill, a cyclist will reduce to 11.31 km/h
+If it is slightly **steeper**, with 4% uphill, a cyclist will reduce to 11.31 km/h
 
 ```{r}
 slope = 4
@@ -194,7 +200,7 @@ length = 50
 speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
-If that same segment is longer, a cyclist will reduce to 10.38 km/h
+If that same segment is **longer**, a cyclist will reduce to 10.38 km/h
 
 ```{r}
 slope = 4
@@ -202,7 +208,7 @@ length = 150
 speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
-For higher gradients, the speed decreases with more sensitivity regarding the segment length.
+For **higher gradients**, the speed decreases with more sensitivity regarding the **segment length**.
 
 ```{r}
 slope = 6
@@ -216,7 +222,7 @@ length = 80
 speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
-And for very steep streets, cycling speed may reduce to walking speed.
+And for **very steep streets**, cycling speed may reduce to walking speed.
 
 ```{r}
 slope = 9
@@ -224,9 +230,9 @@ length = 40
 speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
-### And downhill?
+## And downhill?
 
-In another hand, when going **downhill**, speeds will increase until it gets 3.33 times faster, when the gradient is 13%. For steeper gradients, the cyclist will tend to break, and the speed will be lower.
+In another hand, when going **downhill**, speeds will increase until it gets 3.33x faster, when the gradient is 13%. For steeper gradients, the cyclist will tend to break, and the speed will be lower.
 
 Until the moment when it gets so scary to ride it (again, for a regular urban cyclist with mild experience), that it will take more time to travel that road than if it was flat.
 
@@ -244,9 +250,13 @@ slope = -30
 speedflat / speedfactor(slope, length, g = g(slope, length))
 ```
 
-## Case Study
+# Case Study
 
-```{r}
+Here we will use a small road network from downtown Lisbon (Portugal), retrieved from `slopes()` package, to test the speed-slope factor.
+
+This area is known for a flat and orthogonal set of streets, surrounded by organic and steep streets, ranging from 0 to 21%.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #use example from slopes()
 DATA = slopes::lisbon_road_segments
 DATA$slope = slope_raster(DATA, e = dem_lisbon_raster)
@@ -262,44 +272,63 @@ tmap_mode("view")
 tm_shape(DATA) +
   tm_lines(
     col = "slope_class",
-    palette = palredgreen, #palete de cores
+    palette = palredgreen,
     lwd = 2,
-    id = "slope") #espessura das linhas
-    
+    id = "slope")
+```
 
-DATA$length = st_length(DATA)
+For the purpose of the example, we will assign a direction of the gradient, once that it was not defined.
 
-
+```{r echo=FALSE}
 #assign a direction of slope, for the purpose of the example
-DATA$direction = "FT"
-DATA$direction[(DATA$z0 - DATA$z1) < 0] = "TF"
+DATA$direction = "FT" #From-To
+DATA$direction[(DATA$z0 - DATA$z1) < 0] = "TF" #To-From
 
 mapviewOptions(fgb = FALSE)
 mapview::mapview(DATA["direction"],  selfcontained=TRUE)
+```
 
+And now compute the length, slope, and the speed-slope factor for each segment. We can observe, in a logarithmic y-scale, that there are a lot of flat or almost flat segments (factor around 1), some uphill segments that reach factor 10, and some downhill segments that reach factor 0.3.
+
+```{r}
+#length and slope
+DATA$length = st_length(DATA)
 DATA$slope[DATA$direction == "TF"] = -(DATA$slope[DATA$direction == "TF"])
 slope = DATA$slope
 length = units::drop_units(DATA$length)
+
+#speed-slope factor
 g = g(slope, length)
-
 spf = speedfactor(slope, length, g)
+```
 
+```{r echo=FALSE}
 plot(spf, log="y")
 abline(h = 1, lty = 3)
-DATA$speedfactor = spf
+```
 
+By defining a flat speed of `16 km/h`, it results in segments that are cycled up to 6 minutes uphill, and at a maximum speed of 53 km/h.
 
+```{r}
 #set speed
 speedflat = 16 #set here in km/h (convert to m/s: speed/3.6)
 
+DATA$speedfactor = spf
 DATA$speed = speedflat / DATA$speedfactor
 DATA$time = length / DATA$speed*3.6
 
 mapview::mapview(DATA["speed"])
+summary(DATA$speed)
 mapview::mapview(DATA["time"])
-
+summary(DATA$time)
 ```
+
+> It would be interesting to see also the length on pop map.
 
 This is a work in progress. **Suggestions and comments are welcome**! :) [github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor](https://github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor)
 
-## References
+# Conclusion
+
+Plausible?
+
+# References
