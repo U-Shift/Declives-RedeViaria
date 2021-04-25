@@ -13,84 +13,86 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Different elevation sources may bring better or worse results, when computing slopes for a road network.  
 In many cases, the resolution of raster digital elevation models (DEM) does not matter much, when we assume that they will be small enough for large segments - for instance, if we need to know the gradient of a 2km length highway, planned for motorized vehicles.  
-But when physical effort matters, such as for active travel (walking, cycling), a 50m road with a 2% gradient might be very different that an 8% gradient.  
+But when physical effort matters, such as for active travel (walking, cycling), a 50m road with a 2% gradient might be very different from an 8% gradient.  
 For smaller road segments, getting an accurate gradient value might be an issue, in particular when the free and open data sources do not provide a good resolution.  
-In this example, we will see and compare the results of [slopes R package](https://github.com/ITSLeeds/slopes) for the same road network sample (in Lisbon, Portugal), using **four** different elevation data sources, with different resolution. 
+In this example, we will see and compare the results of [slopes R package](https://github.com/ITSLeeds/slopes) for the same road network sample (in Lisbon, Portugal), using **five** different elevation data sources, with different resolution.
 
 ## Literature
 
-Google Maps Terrain is improving every year [@Harris2014; @Egypt2016; @Wang2017]. It started by using SRTM data, but now at some places, it recurs to LIDAR technology [@Scott2010], although not available yet for all places (see: https://en.wikipedia.org/wiki/National_lidar_dataset). It requires an API key for [elevation access](https://developers.google.com/maps/documentation/elevation/overview).
+In active modes of transportation, such as walking or cycling, movement occurs along a network of elements that set up the pedestrian or the cycling infrastructure. Modelling such networks plays an important role in the planning of transportation, and the related policy design. Thus, spatial data on the natural and built environment is essential to effectively estimate the generic costs or efforts involved in active modes. Topography is a key component of the environment with impact on the physical effort of active travel modes: @Rodriguez2004 explored the direct relation between topography and people's propensity to walk or cycle. As such, to effectively reflect active transportation effort, transportation planning analysis for active modes must take into account a generalized cost of travel reflecting the topography. Slope, the key derived data from topography that most impacts active transportation, has been demonstrated to be one of the factors that bicyclists are sensitive to when deciding on paths [@Broach2012]. @Iseki2014 have examined the extent to which topography influences the determination of bikesheds, while @Macias2016 explored methods for the calculation of pedestrian catchment areas for public transit incorporating topography data and energy expenditure estimates. Despite its importance, topography, and its derived slope quantification, has been identified as a major data limitation in many studies concerning active accessibility in active modes [@Vale2016]. Slope can be estimated using elevation data sources at various scales and obtained using distinct techniques. Slope itself can be calculated using several formulae and algorithms, especially for grid digital elevation models (DEM) [@Tang2011; @Tang2013], but for the case of the linear segments of a transportation network, longitudinal slope is to be assigned.
 
-[OpenTopoData](https://www.opentopodata.org/#public-api ) provides a nice comparison of the available topographic data, regarding its resolution and coverage. Unfortunately, the open ones, with a good resolution, only cover USA and New Zeland. 
+-   Mostrar exemplos de route planners (quantos/que %) usa o declive? E como é que este é obtido?
+-   Mostrar as fontes (texto abaixo, RF)
 
+Google Maps Terrain is improving every year [@Harris2014; @Egypt2016; @Wang2017]. It started by using SRTM data, but now at some places, it recurs to LIDAR technology [@Scott2010], although not available yet for all places (see: <https://en.wikipedia.org/wiki/National_lidar_dataset>). It requires an API key for [elevation access](https://developers.google.com/maps/documentation/elevation/overview).
 
-### Como são calcuados os declives nos DEM?  
-A sua qualidade, resolução, etc, é suficiente para aproximar ao real
+[OpenTopoData](https://www.opentopodata.org/#public-api) provides a nice comparison of the available topographic data, regarding its resolution and coverage. Unfortunately, the open ones, with a good resolution, only cover USA and New Zeland.
 
-Nos datasets abertos, nem sempre dizem como o declive foi calculado.  
+### How are slopes computed using DEMs?
 
-### Problema da escala da informação geográfica para os modos ativos (ruas)
+Is their quality, resolution, etc. enough to approximate the reality?
 
+In open datasets, they don't always say how the slope was computed of which information was used as base.
 
+### The scaling problem of geographic information for active modes (streets)
 
 ## Materials - Data sources
+
 Open data sources.  
 Road Network: OpenstreetMap...
 
-
-### For Elevation Models 
+### For Elevation Models
 
 For this example, we will use and compare four elevation sources:
 
-* NASA Digital Elevation Model, with 27m cell resolution
-* MapBox-Terrain tiles, with 0.1 meter height increments (ref)
-* Google Elevation
-* Copernicus European DEM, with 25m cell resolution
-* Instituto Superior Técnico Digital Elevation Model, with 10m cell resolution
-
+-   NASA Digital Elevation Model, with 27m cell resolution
+-   MapBox-Terrain tiles, with 0.1 meter height increments (ref)
+-   Google Elevation, with resolution of 1.9m
+-   Copernicus European DEM, with 25m cell resolution
+-   Instituto Superior Técnico Digital Elevation Model, with 10m cell resolution
 
 ##### NASA DEM
-The SRTM NASA's mission 
-Os dados do SRTM ([Shuttle Radar Topography Mission](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1-arc)), uma missão da NASA, estão disponíveis gratuitamente, mas para uma resolução de ~30m, com erro da altimetria vertical de 16m. Para fazer donwload do tile correcto, pode-se também recorrer a um outro plugin do QGIS, o SRTM-Donwloader, e pedir para guardar o raster que cobre a shapefile da rede viária - é uma opção no QGIS, e é necessário[ registar uma conta](https://ers.cr.usgs.gov/login).
+
+The SRTM NASA's mission Os dados do SRTM ([Shuttle Radar Topography Mission](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1-arc)), uma missão da NASA, estão disponíveis gratuitamente, mas para uma resolução de \~30m, com erro da altimetria vertical de 16m. Para fazer donwload do tile correcto, pode-se também recorrer a um outro plugin do QGIS, o SRTM-Donwloader, e pedir para guardar o raster que cobre a shapefile da rede viária - é uma opção no QGIS, e é necessário [registar uma conta](https://ers.cr.usgs.gov/login).
 
 This extracted with QGIS SRTM Downloader plugin and clipped)
 
+##### MapBox tiles
 
-##### MapBox tiles 
-Package ceramic https://github.com/hypertidy/ceramic
+Package ceramic <https://github.com/hypertidy/ceramic>
 
-https://docs.mapbox.com/help/troubleshooting/access-elevation-data/
+<https://docs.mapbox.com/help/troubleshooting/access-elevation-data/> Requires an API key The `slopes_3d()` function from slopes package retrieves the z-values information for each vertice, storing an xy linestring as a xyz linestring.
+
+##### Google Elevation
+
+It varies from place to place. In Lisbon the resolution is of 1.93m.  
 Requires an API key
-The `slopes_3d()` function from slopes packages retrieves the z-values information for each vertice, storing an xy linestring as a xyz linestring.
-
-##### Google Elevation  
-Varia de local para local. Em Lisboa a resolução é de 1.92m (dizem).    
 
 ##### Copernicus DEM
-The European Land Monitoring Service [@copernicus_2019]  
-25m resolution and vertical accuracy of +/- 7m RMSE [@copernicus_2017], for all Europe.
 
+The European Land Monitoring Service [@copernicus_2019]  
+25m resolution and vertical accuracy of +/- 7m RMSE [@copernicus_2017], for all Europe. The `slopes_xyz()` function from slopes package retrieves the average weighted slope from a xyz linestring.
 
 ##### IST DEM
-This DEM was acquired by Instituto Superior Técnico (University of Lisbon) by 2012, covers all the Northern Metropolitan Area of Lisbon, and has a 10m cell resolution, when projected at the official Portuguese EPSG: 3763 - TM06/ETRS89. No more is known about this raster, and it has been used in several projects at CERIS Research Center.
-Modelo de Helena Rua das Linhas de Torres Vedras: digitalizou-se as curvas de nível e converteu-se para raster.
 
+This DEM was acquired by Instituto Superior Técnico (University of Lisbon) by 2012, covers all the Northern Metropolitan Area of Lisbon, and has a 10m cell resolution, when projected at the official Portuguese EPSG: 3763 - TM06/ETRS89. No more is known about this raster, and it has been used in several projects at CERIS Research Center. Modelo de Helena Rua das Linhas de Torres Vedras: digitalizou-se as curvas de nível e converteu-se para raster.
 
 ### For the road network
+
 A sample of Lisbon's Road Network, available on OpenStreetMap.  
-After retrieving the data from "portugal" - the only dataset available at the moment for the case study -, we will make a buffer of 2000m around "Campo Martires Patria", right in the center of Lisbon, and collect a sample that contains variability regarding:  
+After retrieving the data from "portugal" - the only dataset available at the moment for the case study -, we will make a buffer of 2000m around "Campo Martires Patria", right in the center of Lisbon, and collect a sample that contains variability regarding:
 
-* types of highways, from large avenues to small stairs
-* orthogonal and organic highways or streets
-* flat and hilly highways
-* flat and hilly areas
-* long and short highways
-
+-   types of highways, from large avenues to small stairs
+-   orthogonal and organic highways or streets
+-   flat and hilly highways
+-   flat and hilly areas
+-   long and short highways
 
 ## Methods
 
 ### To prerare the road netwotk
-```{r message=FALSE, warning=FALSE}
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
 #load required packages
 library(dplyr)
 library(sf)
@@ -102,12 +104,13 @@ library(geodist)
 library(tmap)
 ```
 
-1. Retrieve the OSM road network and filter by highway classes, removing pathways
+1.  Retrieve the OSM road network and filter by highway classes, removing pathways
 
 ```{r eval=FALSE}
 portugal_osm = oe_get("Portugal", provider = "geofabrik", stringsAsFactors = FALSE,
                       quiet = FALSE, force_download = TRUE, force_vectortranslate = TRUE) #218 MB!
 ```
+
 ```{r eval=FALSE}
 portugal_osm_filtered = portugal_osm %>%
   dplyr::filter(
@@ -120,15 +123,16 @@ portugal_osm_filtered = portugal_osm %>%
     )
   )
 ```
+
 ```{r include=FALSE}
 # OSMpt = "https://github.com/U-Shift/Declives-RedeViaria/releases/download/0.3/portugal_osm_filtered.Rds"
 # portugal_osm_filtered = readRDS(url(u, "rb"))
 portugal_osm_filtered = readRDS("D:/GIS/OSM/portugal_osm_filtered.Rds")
 ```
 
-2. Create a buffer area with 2km around a point in the center of Lisbon, and clip the road network with it
+2.  Create a buffer area with 2km around a point in the center of Lisbon, and clip the road network with it
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 #buffer area
 lisbon_sf = tmaptools::geocode_OSM("campo mártires da pátria", as.sf = TRUE)
 lisbon_buffer = stplanr::geo_buffer(shp = lisbon_sf, dist = 2000)
@@ -137,9 +141,9 @@ osm_lines_lisbon = st_crop(portugal_osm_filtered, lisbon_buffer) %>%  #clip by b
                     st_intersection(lisbon_buffer)
 ```
 
-3. Clean the road netwok, by removing unconnected segments
+3.  Clean the road netwok, by removing unconnected segments
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 osm_lines_lisbon$group = stplanr::rnet_group(osm_lines_lisbon)
 plot(osm_lines_lisbon["group"])
 osm_lines_lisbon_clean = osm_lines_lisbon %>% filter(group == 1) #keep only the main network cluster
@@ -147,37 +151,39 @@ osm_lines_lisbon_clean = osm_lines_lisbon %>% filter(group == 1) #keep only the 
 # st_geometry(osm_lines_lisbon_clean) #geometry type:  GEOMETRY || it is required to be LINESTRING
 ```
 
-4. Filter from the OSM original network, the segments in the clean one
+4.  Filter from the OSM original network, the segments in the clean one
 
-```{r}
+```{r include=FALSE}
 RoadNetwork = portugal_osm_filtered %>% filter(osm_id %in% osm_lines_lisbon_clean$osm_id) #ficar apenas os segmentos da rede limpa
 ```
 
-5. Breaking up the road segments at their internal vertices, but leaving _brunels_ (bridges and tunnels) intact 
+5.  Breake up the road segments at their internal vertices, but leaving *brunels* (bridges and tunnels) intact
 
-```{r message=TRUE, warning=TRUE}
+```{r message=TRUE, warning=TRUE, include=FALSE}
 RoadNetwork = stplanr::rnet_breakup_vertices(RoadNetwork)
 nrow(RoadNetwork)
 ```
+
 ```{r eval=FALSE, include=FALSE}
 mapview::mapview(RoadNetwork)
 ```
 
-
 ### To estimate the slope of road network segments
+
 ##### With NASA DEM
 
-* Import the DEM and make sure the road network dataset has the same projection
+-   Import the DEM and make sure the road network dataset has the same projection
 
-```{r}
+```{r include=FALSE}
 demNASA = raster::raster("raster/LisboaNASA_clip.tif")
 ```
+
 ```{r echo=FALSE}
 raster::plot(demNASA)
 plot(sf::st_geometry(RoadNetwork), add = TRUE)
 ```
 
-* Estimate the gradient
+-   Estimate the gradient
 
 ```{r}
 RoadNetworkNASA = RoadNetwork
@@ -187,10 +193,11 @@ RoadNetworkNASA$slope_pct = RoadNetworkNASA$slope*100 #percentage
 
 ##### With Map Box
 
-* Estimate the gradient, directly with `slopes`  
-The `slopes_3d()` function from slopes packages retrieves the z-values information for each vertice, storing an xy linestring as a xyz linestring.
+-   Estimate the gradient, directly with `slopes`  
 
-```{r warning=FALSE}
+The `slopes_3d()` function from slopes package retrieves the z-values information for each vertice, storing an xy linestring as a xyz linestring.
+
+```{r message=FALSE, warning=FALSE}
 RoadNetworkMBox = slope_3d(r= RoadNetwork)
 RoadNetworkMBox$slope = slope_xyz(RoadNetworkMBox)
 RoadNetworkMBox$slope_pct = RoadNetworkMBox$slope*100 #percentage
@@ -198,51 +205,64 @@ RoadNetworkMBox$slope_pct = RoadNetworkMBox$slope*100 #percentage
 
 ##### With EU-DEM
 
-* Import the DEM and make sure the road network dataset has the same projection
+-   Import the DEM and make sure the road network dataset has the same projection
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 demEU = raster::raster("raster/LisboaCOPERNICUS_clip.tif")
 crs(demEU) = CRS('+init=EPSG:3035') #assign official projection (ETRS89-LAEA)
 ```
+
 ```{r echo=FALSE}
 RoadNetworkEU = st_transform(RoadNetwork, 3035) #to the same projection as demEU
 raster::plot(demEU)
 plot(sf::st_geometry(RoadNetworkEU), add = TRUE)
 ```
 
-* Estimate the gradient
+-   Estimate the gradient
 
-```{r}
+```{r warning=FALSE}
 RoadNetworkEU$slope = slope_raster(RoadNetworkEU, e = demEU)
 RoadNetworkEU$slope_pct = RoadNetworkEU$slope*100 #percentage
 ```
 
+##### With Google Elevation
+
+-   Estimate the gradient, directly with `slopes`  
+
+The `slopes_xyz` function from slopes package retrieves the average weighted slope from a xyz linestring.
+
+```{r message=FALSE, warning=FALSE}
+RoadNetworkGMAP = readRDS("Benchmark_files/google.Rds")
+RoadNetworkGMAP$slope = slope_xyz(RoadNetworkGMAP)
+RoadNetworkGMAP$slope_pct = RoadNetworkGMAP$slope*100 #percentage
+```
 
 ##### With IST DEM
 
-* Import the DEM and make sure the road network dataset has the same projection
+-   Import the DEM and make sure the road network dataset has the same projection
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 demIST = raster::raster("raster/LisboaIST_clip_r1.tif")
 crs(demIST) = CRS('+init=EPSG:3763') #assign official projection (Portugal TM06/ETRS89)
 ```
+
 ```{r echo=FALSE}
 RoadNetworkIST = st_transform(RoadNetwork, 3763) #to the same projection as demIST
 raster::plot(demIST)
 plot(sf::st_geometry(RoadNetworkIST), add = TRUE)
 ```
 
-* Estimate the gradient
+-   Estimate the gradient
 
 ```{r}
 RoadNetworkIST$slope = slope_raster(RoadNetworkIST, e = demIST)
 RoadNetworkIST$slope_pct = RoadNetworkIST$slope*100 #percentage
 ```
 
-
 ## Results
 
 #### Compare the used DEM values
+
 ```{r echo=FALSE, warning=FALSE}
 t0 = rbind(summary(values(demNASA)), summary(values(demEU)), summary(values(demIST)))
 row.names(t0) = c("STRM NASA", "EU-DEM Copernicus", "IST DEM")
@@ -251,7 +271,6 @@ t0 = cbind(resolution, t0)
 knitr::kable(t0, digits = 2, caption = "DEM information for the area")
 ```
 
-
 #### Compare the estimated gradient values for each method
 
 ```{r echo=FALSE}
@@ -259,25 +278,28 @@ knitr::kable(t0, digits = 2, caption = "DEM information for the area")
 RoadNetworkEU = RoadNetworkEU %>% filter(!is.na(RoadNetworkEU$slope_pct))
 RoadNetworkNASA = RoadNetworkNASA %>% filter(osm_id %in% RoadNetworkEU$osm_id)
 RoadNetworkMBox = RoadNetworkMBox %>% filter(osm_id %in% RoadNetworkEU$osm_id)
+RoadNetworkGMAP = RoadNetworkGMAP %>% filter(osm_id %in% RoadNetworkEU$osm_id)
 RoadNetworkIST = RoadNetworkIST %>% filter(osm_id %in% RoadNetworkEU$osm_id)
 
 #make common summary table
 t1 = rbind(summary(RoadNetworkNASA$slope_pct), summary(RoadNetworkMBox$slope_pct),
-           summary(RoadNetworkEU$slope_pct), summary(RoadNetworkIST$slope_pct))
-row.names(t1) = c("STRM NASA", "Ceramic MapBox", "EU-DEM Copernicus", "IST DEM")
+           summary(RoadNetworkEU$slope_pct), summary(RoadNetworkGMAP$slope_pct),
+           summary(RoadNetworkIST$slope_pct))
+row.names(t1) = c("STRM NASA", "Ceramic MapBox", "EU-DEM Copernicus", "Google Elevation", "IST DEM")
 knitr::kable(t1, digits = 3, caption = "Result summaries")
 ```
 
+*Remove segments with gradient above 60%?*
+
 ```{r echo=FALSE}
-df= as.data.frame(cbind(RoadNetworkNASA$slope_pct,RoadNetworkMBox$slope_pct,RoadNetworkIST$slope_pct)) #EU missing - 3 segments difference
-names(df)=c("STRM NASA", "Ceramic MapBox", "IST DEM")
+df= as.data.frame(cbind(RoadNetworkNASA$slope_pct,RoadNetworkMBox$slope_pct, RoadNetworkGMAP$slope_pct, RoadNetworkIST$slope_pct)) #EU missing - 3 segments difference
+names(df)=c("STRM NASA", "Ceramic MapBox", "Google Maps", "IST DEM")
 # DataExplorer::plot_histogram(df, ncol = 2)
 DataExplorer::plot_density(df, ncol = 2)
 # DataExplorer::plot_qq(df, ncol = 2)
 ```
 
-
-* Adopt a simplistic qualitative classification for cycling effort uphill, and compare the number of segments in each class
+-   Adopt a simplistic qualitative classification for cycling effort uphill, and compare the number of segments in each class
 
 ```{r include=FALSE}
 RoadNetworkNASA$slope_class = RoadNetworkNASA$slope_pct %>%
@@ -292,24 +314,47 @@ RoadNetworkEU$slope_class = RoadNetworkEU$slope_pct %>%
   cut(breaks = c(0, 3, 5, 8, 10, 20, Inf),
     labels = c("0-3: flat", "3-5: mild", "5-8: medium", "8-10: hard", "10-20: extreme", ">20: impossible"),
     right = F)
+RoadNetworkGMAP$slope_class = RoadNetworkGMAP$slope_pct %>%
+  cut(breaks = c(0, 3, 5, 8, 10, 20, Inf),
+    labels = c("0-3: flat", "3-5: mild", "5-8: medium", "8-10: hard", "10-20: extreme", ">20: impossible"),
+    right = F)
 RoadNetworkIST$slope_class = RoadNetworkIST$slope_pct %>%
   cut(breaks = c(0, 3, 5, 8, 10, 20, Inf),
     labels = c("0-3: flat", "3-5: mild", "5-8: medium", "8-10: hard", "10-20: extreme", ">20: impossible"),
     right = F)
 
 ```
+
 ```{r echo=FALSE}
 propNASA = round(prop.table(table(RoadNetworkNASA$slope_class))*100,1)
 propMB = round(prop.table(table(RoadNetworkMBox$slope_class))*100,1) 
 propEU = round(prop.table(table(RoadNetworkEU$slope_class))*100,1) 
+propGMAP = round(prop.table(table(RoadNetworkGMAP$slope_class))*100,1) 
 propIST = round(prop.table(table(RoadNetworkIST$slope_class))*100,1) 
 
-t2 = rbind(propNASA, propMB, propEU, propIST)
-row.names(t2) = c("STRM NASA", "Ceramic MapBox", "EU-DEM Copernicus", "IST DEM")
+t2 = rbind(propNASA, propMB, propEU, propGMAP, propIST)
+row.names(t2) = c("STRM NASA", "Ceramic MapBox", "EU-DEM Copernicus", "Google Elevation", "IST DEM")
 knitr::kable(t2, digits = 1, caption = "Percentage of road segments in each gradient interval and qualitative class")
 ```
 
-* View maps side by side
+```{r eval=FALSE, include=FALSE}
+RoadNetworkNASA$length = units::drop_units(st_length(RoadNetworkNASA))
+
+#como fazer este?
+sum(RoadNetworkNASA$length[RoadNetworkNASA$slope_class==">20: impossible"])
+
+proplNASA = round(prop.table(table(RoadNetworkNASA$slope_class))*100,1)
+proplMB = round(prop.table(table(RoadNetworkMBox$slope_class))*100,1) 
+proplEU = round(prop.table(table(RoadNetworkEU$slope_class))*100,1) 
+proplGMAP = round(prop.table(table(RoadNetworkGMAP$slope_class))*100,1) 
+proplIST = round(prop.table(table(RoadNetworkIST$slope_class))*100,1) 
+
+t3 = rbind(proplNASA, proplMB, proplEU, proplGMAP, proplIST)
+row.names(t3) = c("STRM NASA", "Ceramic MapBox", "EU-DEM Copernicus", "Google Elevation", "IST DEM")
+knitr::kable(t3, digits = 1, caption = "Percentage of road segment lengths in each gradient interval and qualitative class")
+```
+
+-   View maps side by side
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 palredgreen = c("#267300", "#70A800", "#FFAA00", "#E60000", "#A80000", "#730000") #color palette
@@ -342,6 +387,15 @@ slopesEU =
     lwd = 1.8, 
     title.col = "Gradient [%]"
   )
+slopesGMAP = 
+  tm_layout(title = "Google 2m", legend.show = F) +
+  tm_shape(RoadNetworkGMAP) +
+  tm_lines(
+    col = "slope_class",
+    palette = palredgreen, 
+    lwd = 1.8, 
+    title.col = "Gradient [%]"
+  )
 slopesIST = 
   tm_layout(title = "IST 10m", legend.show = F) +
   tm_shape(RoadNetworkIST) +
@@ -351,7 +405,7 @@ slopesIST =
     lwd = 1.8, 
     title.col = "Gradient [%]"
   )
-tmap_arrange(slopesNASA, slopesMBox, slopesEU, slopesIST) #map grid
+tmap_arrange(slopesNASA, slopesMBox, slopesEU, slopesGMAP, slopesIST, ncol = 2) #map grid
 tm_shape(RoadNetworkIST) +
   tm_lines(
     col = "slope_class",
@@ -362,31 +416,27 @@ tm_shape(RoadNetworkIST) +
   tm_layout(legend.only = T)
 ```
 
-### Comparação  
-Que estatísticas usar?  
-Ver ONDE variam mais, se é nas zonas planas, ou nas zonas sinuosas, ou nas ruas orgânicas/ortogonaisl...  
-Padrões de variação  
+### Comparing results
 
-
+Which statistics to use?  
+Check **where** they have a higher variation, if on flat or hilly areas, if on organic or orthogonal streets areas...  
+Variation patterns
 
 ## Discussion
-_Google Elevation data will also be compared._
 
-Qual a metodologia recomendada?  
-Qual o intervalo de **"resolução"**, ou de **copmrimento de segmentos**, ou **outro indicador**, recomendado para o cálculo de declives para modos ativos?
-  
-Isto é mais orientado para que bike route planners sejam mais fiáveis para dar uma melhor experiência ao ciclista (ao contrário de uma má e desmotivadora experiência?)
+We can see that even with the finer resolution (assuming google), it brings up some errors, when road segments cross tunnels or bridges.
 
-### Validação
-Com uma amostra de algumas ruas em Lisboa em que iremos medir com instrumentos de topografia  
-**OU** com carotografia disponível da CML, 1:1000, com vários pontos cotados.
+Which methodology we recommend, facing these results? What is the range of **"resolution"**, or **segment length**, or **another variable**, that best fits for slopes processing in active transportation?
 
+This is more oriented towards bike route planners being more reliable to give a better experience to the cyclist (as opposed to a bad and demotivating experience)?
 
-#### Variação dentro do próprio segmento  
-Cruzar com a validação dos pontos cotados da CML.  
+### Validation
+
+With a sample of some streets in Lisbon that we will measure with topographical instruments  
+**OR** with official cartography available from Lisbon Municipality open data, scale 1:1000, with several marked points
+
+#### Variation within the segments
+
+Cross-check with the validation of Lisbon Municipality cartography
 
 ## References
-
-
-
-
