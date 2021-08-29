@@ -9,7 +9,7 @@ library(slopes)
 
 #use example from slopes()
 DATA = slopes::lisbon_road_segments
-DATA$slope = slope_raster(DATA, e = dem_lisbon_raster)
+DATA$slope = slope_raster(DATA, dem = dem_lisbon_raster)
 DATA$slope_class = DATA$slope %>% 
   cut(
     breaks = c(0, .03, .05, .08, .10, .20, Inf),

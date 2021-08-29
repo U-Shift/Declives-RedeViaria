@@ -37,7 +37,7 @@ plot(sf::st_geometry(network), add = TRUE) #check if they overlay
 # Get the slope value for each segment (abs), using slopes package
 library(slopes)
 library(geodist)
-network$slope = slope_raster(network, e = DEM) #about 15sec
+network$slope = slope_raster(network, dem = DEM) #about 15sec
 network$slope = network$slope*100 #percentage
 summary(network$slope) #!
 

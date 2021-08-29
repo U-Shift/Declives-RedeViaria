@@ -78,7 +78,7 @@ raster::plot(DEM)
 plot(sf::st_geometry(RedeViaria), add = TRUE) #verificar se coincidem
 
 #calcular os declives de cada segmento (em absoluto)
-RedeViaria$slope = slope_raster(RedeViaria, e = DEM)
+RedeViaria$slope = slope_raster(RedeViaria, dem = DEM)
 RedeViaria$declive = RedeViaria$slope*100 #em percentagem
 summary(RedeViaria$declive)
 RedeViaria$declive_class = RedeViaria$declive %>%

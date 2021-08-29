@@ -111,7 +111,9 @@ library(tmap)
 RedeViaria = st_read("shapefiles/RedeViariaPorto_osm.shp")
 ```
 
-    ## Reading layer `RedeViariaPorto_osm' from data source `D:\GIS\Declives-RedeViaria\shapefiles\RedeViariaPorto_osm.shp' using driver `ESRI Shapefile'
+    ## Reading layer `RedeViariaPorto_osm' from data source 
+    ##   `D:\GIS\Declives-RedeViaria\shapefiles\RedeViariaPorto_osm.shp' 
+    ##   using driver `ESRI Shapefile'
     ## Simple feature collection with 13738 features and 9 fields
     ## Geometry type: LINESTRING
     ## Dimension:     XY
@@ -173,7 +175,7 @@ vai-se calcular os declives de cada segmento da rede, em modo absoluto.
 Ler mais na página do package sobre como são calculados.
 
 ``` r
-RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #28 segundos
+RedeViaria$slope = slope_raster(RedeViaria, dem = DEM) #28 segundos
 ```
 
 Declives em percentagem: *mínimo, P25, mediana, média, P75, max*.
@@ -339,5 +341,7 @@ Declives da rede viária de Lisboa (10m):
     (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_EU.html)
 -   [Isle of Wight
     (UK)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesIoW.html)
+-   [Leeds
+    (UK)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesLeeds.html)
 -   [São Paulo
     (BR)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesSaoPaulo.html)

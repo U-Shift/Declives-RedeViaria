@@ -129,7 +129,7 @@ plot(sf::st_geometry(RedeViaria), add = TRUE) #verificar se coincidem
 ![GuardaDEM](figs/GuardaDEM.png?raw=true)
 
 ```{r message=FALSE, warning=FALSE}
-RedeViaria$slope = slope_raster(RedeViaria, e = DEM) #19s
+RedeViaria$slope = slope_raster(RedeViaria, dem = DEM) #19s
 RedeViaria$declive = RedeViaria$slope*100
 RedeViaria$declive_class = RedeViaria$declive %>%
   cut(

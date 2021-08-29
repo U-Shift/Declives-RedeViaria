@@ -310,7 +310,7 @@ speedflat / speedfactor(slope, length, g = g(slope, length))
 ``` r
 #use example from slopes()
 DATA = slopes::lisbon_road_segments
-DATA$slope = slope_raster(DATA, e = dem_lisbon_raster)
+DATA$slope = slope_raster(DATA, dem = dem_lisbon_raster)
 DATA$slope = 100*DATA$slope
 DATA$slope_class = DATA$slope %>% 
   cut(

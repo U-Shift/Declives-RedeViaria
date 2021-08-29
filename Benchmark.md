@@ -207,7 +207,7 @@ portugal_osm_filtered = portugal_osm %>%
 
 ``` r
 RoadNetworkNASA = RoadNetwork
-RoadNetworkNASA$slope = slope_raster(RoadNetworkNASA, e = demNASA)
+RoadNetworkNASA$slope = slope_raster(RoadNetworkNASA, dem = demNASA)
 RoadNetworkNASA$slope_pct = RoadNetworkNASA$slope*100 #percentage
 ```
 
@@ -241,7 +241,7 @@ RoadNetworkMBox$slope_pct = RoadNetworkMBox$slope*100 #percentage
 -   Estimate the gradient
 
 ``` r
-RoadNetworkEU$slope = slope_raster(RoadNetworkEU, e = demEU)
+RoadNetworkEU$slope = slope_raster(RoadNetworkEU, dem = demEU)
 RoadNetworkEU$slope_pct = RoadNetworkEU$slope*100 #percentage
 ```
 
@@ -268,7 +268,7 @@ RoadNetworkGMAP$slope_pct = RoadNetworkGMAP$slope*100 #percentage
 -   Estimate the gradient
 
 ``` r
-RoadNetworkIST$slope = slope_raster(RoadNetworkIST, e = demIST)
+RoadNetworkIST$slope = slope_raster(RoadNetworkIST, dem = demIST)
 RoadNetworkIST$slope_pct = RoadNetworkIST$slope*100 #percentage
 ```
 

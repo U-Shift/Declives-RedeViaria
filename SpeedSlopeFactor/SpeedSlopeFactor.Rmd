@@ -259,7 +259,7 @@ This area is known for a flat and orthogonal set of streets, surrounded by organ
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #use example from slopes()
 DATA = slopes::lisbon_road_segments
-DATA$slope = slope_raster(DATA, e = dem_lisbon_raster)
+DATA$slope = slope_raster(DATA, dem = dem_lisbon_raster)
 DATA$slope = 100*DATA$slope
 DATA$slope_class = DATA$slope %>% 
   cut(
