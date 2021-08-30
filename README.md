@@ -325,23 +325,25 @@ Declives da rede viária de Lisboa (10m):
 ## Mapas de declives, criados a partir deste script
 
 -   [Almada
-    (NASA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_SRTM.html)
+    (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_SRTM.html)
     \| [Almada
-    (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_EU.html)
+    (ESA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_EU.html)
 -   [Braga
-    (NASA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
+    (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
     \| [Braga
-    (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga_EU.html)
--   [Guarda](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGuarda.html)
--   [Lisboa](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html)
--   [Loures](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLoures.html)
+    (ESA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga_EU.html)
+-   [Guarda](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGuarda.html)
+-   [Lisboa](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html)
+-   [Loures](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLoures.html)
 -   [Porto
-    (NASA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_SRTM.html)
+    (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_SRTM.html)
     \| [Porto
-    (ESA)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_EU.html)
+    (ESA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_EU.html)
 -   [Isle of Wight
-    (UK)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesIoW.html)
+    (UK)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesIoW.html)
 -   [Leeds
-    (UK)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesLeeds.html)
+    (UK)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesLeeds.html)
 -   [São Paulo
-    (BR)](http://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesSaoPaulo.html)
+    (BR)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesSaoPaulo.html)
+-   [Zurich
+    (CH)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesZurich.html)
