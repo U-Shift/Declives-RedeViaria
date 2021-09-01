@@ -347,3 +347,5 @@ Declives da rede viária de Lisboa (10m):
     (BR)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesSaoPaulo.html)
 -   [Zurich
     (CH)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesZurich.html)
+-   [Amsterdam
+    (NL)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesAmsterdam.html)
