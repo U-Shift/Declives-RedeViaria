@@ -345,6 +345,8 @@ Declives da rede viária de Lisboa (10m):
     (UK)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesLeeds.html)
 -   [São Paulo
     (BR)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesSaoPaulo.html)
+-   [Medellín
+    (CO)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesMedellin.html)
 -   [Zurich
     (CH)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesZurich.html)
 -   [Amsterdam
