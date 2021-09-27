@@ -170,7 +170,7 @@ plot(sf::st_geometry(RedeViaria), add = TRUE)
 
 ### Declives
 
-Através do package [**slopes**](https://github.com/itsleeds/slopes),
+Através do package [**slopes**](https://github.com/ropensci/slopes),
 vai-se calcular os declives de cada segmento da rede, em modo absoluto.
 Ler mais na página do package sobre como são calculados.
 

@@ -15,7 +15,7 @@ Different elevation sources may bring better or worse results, when computing sl
 In many cases, the resolution of raster digital elevation models (DEM) does not matter much, when we assume that they will be small enough for large segments - for instance, if we need to know the gradient of a 2km length highway, planned for motorized vehicles.  
 But when physical effort matters, such as for active travel (walking, cycling), a 50m road with a 2% gradient might be very different from an 8% gradient.  
 For smaller road segments, getting an accurate gradient value might be an issue, in particular when the free and open data sources do not provide a good resolution.  
-In this example, we will see and compare the results of [slopes R package](https://github.com/ITSLeeds/slopes) for the same road network sample (in Lisbon, Portugal), using **five** different elevation data sources, with different resolution.
+In this example, we will see and compare the results of [slopes R package](https://github.com/ropensci/slopes) for the same road network sample (in Lisbon, Portugal), using **five** different elevation data sources, with different resolution.
 
 ## Literature
 

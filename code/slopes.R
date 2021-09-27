@@ -9,7 +9,7 @@
 # remotes = c("stplnar", "osmextract")
 # install.packages(pkgs)
 # install.packages("remotes", quiet = TRUE)
-# remotes::install_github("ITSLeeds/osmextract")
+# remotes::install_github("ropensci/osmextract")
 # remotes::install_github("ropensci/stplanr")
 
 #importar packages

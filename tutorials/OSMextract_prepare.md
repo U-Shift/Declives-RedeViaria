@@ -13,7 +13,7 @@ Neste tutorial vou descrever como:
 ## Fazer download da rede do Open Street Maps
 
 Para este passo é necessário usar o
-[package](https://itsleeds.github.io/osmextract/articles/osmextract.html)
+[package](https://ropensci.github.io/osmextract/articles/osmextract.html)
 `osmextract` que faz download do ficheiro mais actual do OSM que esteja
 disponível em <https://download.geofabrik.de/index.html>  
 Para Portugal, o ficheiro disponível tem **218MB**. O `osmextract` faz o
@@ -21,7 +21,7 @@ donwload por região disponível, e converte para o formato `geopackage`
 (ou .gpkg) (equivalente ao `shapefile`, mas nativo do QGIS).
 
 ``` r
-# remotes::install_github("ITSLeeds/osmextract")
+# remotes::install_github("ropensci/osmextract")
 # remotes::install_github("ropensci/stplanr")
 library(osmextract)
 library(sf)

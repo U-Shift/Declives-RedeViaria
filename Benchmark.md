@@ -16,7 +16,7 @@ For smaller road segments, getting an accurate gradient value might be
 an issue, in particular when the free and open data sources do not
 provide a good resolution.  
 In this example, we will see and compare the results of [slopes R
-package](https://github.com/ITSLeeds/slopes) for the same road network
+package](https://github.com/ropensci/slopes) for the same road network
 sample (in Lisbon, Portugal), using **five** different elevation data
 sources, with different resolution.
 
