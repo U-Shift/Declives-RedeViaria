@@ -332,9 +332,11 @@ Declives da rede viária de Lisboa (10m):
     (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
     \| [Braga
     (ESA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga_EU.html)
+-   [Cascais](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesCascais_EU.html)
 -   [Guarda](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGuarda.html)
 -   [Lisboa](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLisboa.html)
 -   [Loures](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesLoures.html)
+-   [Oeiras](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesOeiras_EU.html)
 -   [Porto
     (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_SRTM.html)
     \| [Porto
