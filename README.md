@@ -328,6 +328,7 @@ Declives da rede viária de Lisboa (10m):
     (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_SRTM.html)
     \| [Almada
     (ESA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAlmada_EU.html)
+-   [Amadora](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAmadora_EU.html)
 -   [Aveiro](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesAveiro_EU.html)
 -   [Braga
     (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesBraga.html)
@@ -343,6 +344,8 @@ Declives da rede viária de Lisboa (10m):
     (NASA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_SRTM.html)
     \| [Porto
     (ESA)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesPorto_EU.html)
+-   [Vila Nova de
+    Gaia](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/DeclivesGaia_EU.html)
 -   [Isle of Wight
     (UK)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesIoW.html)
 -   [Leeds
