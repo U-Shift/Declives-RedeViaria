@@ -1,6 +1,7 @@
 ---
 title: "Declives RedeViaria"
 output: github_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
@@ -211,3 +212,5 @@ Declives da rede viária de Lisboa (10m): http://web.tecnico.ulisboa.pt/~rosamfe
 * [Medellín (CO)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesMedellin.html)
 * [Zurich (CH)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesZurich.html)
 * [Amsterdam (NL)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesAmsterdam.html)
+* [Paris (FR)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesParis.html)
+
