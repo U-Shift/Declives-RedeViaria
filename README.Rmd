@@ -51,12 +51,12 @@ O novo método passa por escolher o tile a partir da grid, identificar as coorde
 
 > Example of direct query for a 30m DEM tile (North 29°- East 14°): <https://prism-dem-open.copernicus.eu/pd-desk-open-access/prismDownload/COP-DEM_GLO-30-DGED__2022_1/Copernicus_DSM_10_N29_00_E014_00.tar> [source](https://sentinels.copernicus.eu/web/sentinel/-/copernicus-dem-new-direct-data-download-access)
 
-> Neste caso, é necessário re-projectar a rede viária no sistema de coordenadas do DEM: `EPGS-3035` para ETRS89-LAEA.
-
 ![](images/clipboard-992788607.png)
 
 Como o raster cobre uma área bem maior do que necessitamos (ver ficheiro `N41W009.hgt`), podemos sempre fazer um *clip* para ficar com dimensões mais adequadas à nossa análise: `Raster > Extraction > Clip Raster by Extent`.\
 O ficheiro `PortoNASA_clip.tif` ou `PortoCOPERNICUS_clip.tif` na pasta `raster` já foi cortado para uma área mais adequada à cidade do Porto.
+
+> Neste caso, é necessário re-projectar a rede viária no sistema de coordenadas do DEM: `EPGS-3035` para ETRS89-LAEA. (*já não se aplica!*)
 
 ## Cálculo dos Declives
 
@@ -240,4 +240,4 @@ Declives da rede viária de Lisboa (10m): <http://web.tecnico.ulisboa.pt/~rosamf
 -   [Medellín (CO)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesMedellin.html)
 -   [Zurich (CH)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesZurich.html)
 -   [Amsterdam (NL)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesAmsterdam.html)
--   [Paris (FR)](https://web.tecnico.ulisboa.pt/~rosamfelix/gis/declives/SlopesParis.html)
+-   [Paris (NASA)](http://rosafelix.bike/gis/declives/SlopesParis_NASA.html) \| [Paris (ESA)](http://rosafelix.bike/gis/declives/SlopesParis_ESA.html)
