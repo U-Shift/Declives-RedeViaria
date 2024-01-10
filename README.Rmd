@@ -51,7 +51,7 @@ O novo método passa por escolher o tile a partir da grid, identificar as coorde
 
 > Example of direct query for a 30m DEM tile (North 29°- East 14°): <https://prism-dem-open.copernicus.eu/pd-desk-open-access/prismDownload/COP-DEM_GLO-30-DGED__2022_1/Copernicus_DSM_10_N29_00_E014_00.tar> [source](https://sentinels.copernicus.eu/web/sentinel/-/copernicus-dem-new-direct-data-download-access)
 
-![](images/clipboard-992788607.png)
+![](images/clipboard-992788607.png){width="800"}
 
 Como o raster cobre uma área bem maior do que necessitamos (ver ficheiro `N41W009.hgt`), podemos sempre fazer um *clip* para ficar com dimensões mais adequadas à nossa análise: `Raster > Extraction > Clip Raster by Extent`.\
 O ficheiro `PortoNASA_clip.tif` ou `PortoCOPERNICUS_clip.tif` na pasta `raster` já foi cortado para uma área mais adequada à cidade do Porto.
@@ -172,7 +172,7 @@ palredgreen = c("#267300", "#70A800", "#FFAA00", "#E60000", "#A80000", "#730000"
 
 usando o [**tmap**](https://github.com/mtennekes/tmap/)
 
-```{r message=FALSE, warning=FALSE}
+```{r eval=FALSE, message=FALSE, warning=FALSE, echo=TRUE}
 tmap_mode("view")
 tmap_options(basemaps = leaflet::providers$CartoDB.Positron) #mapa base
 mapadeclives =
