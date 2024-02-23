@@ -1,7 +1,8 @@
 ---
 title: "Speed-Slope factor"
 author: "Rosa Félix"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+# date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "15 april, 2021"
 output:
   html_document:
     fig_caption: yes
@@ -29,7 +30,10 @@ library(sf)
 library(slopes)
 library(tmap)
 library(mapview)
+mapviewOptions(fgb = FALSE)
 ```
+
+This short paper proposes a slope factor method to be used in routing algorithms for cycling, suited for hilly cities.
 
 # Cost for bicycle routing models
 
@@ -112,12 +116,13 @@ $$slope factor_{(slope,length)}adjst = \begin{cases}
 ```{r include=FALSE}
 #g function
 g = function(slope, length){
-  ifelse((slope > 3 & slope <= 5 & length > 120), 6, 
-    ifelse((slope > 5 & slope <= 8 & length > 60), 5, 
-      ifelse((slope > 8 & slope <= 10 & length > 30), 4.5,
-        ifelse((slope > 10 & slope <= 13 & length > 15), 4,
+  ifelse((slope > 10 & slope <= 13 & length > 15), 4, 
+    ifelse((slope > 8 & slope <= 10 & length > 30), 4.5,
+      ifelse((slope > 5 & slope <= 8 & length > 60), 5, 
+        ifelse((slope > 3 & slope <= 5 & length > 120), 6, 
                7))))
 }
+
 #slope-factor function
 speedfactor = function(slope, length, g) {
   ifelse(ifelse((slope < -30),1.5,
@@ -258,9 +263,9 @@ This area is known for a flat and orthogonal set of streets, surrounded by organ
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #use example from slopes()
-DATA = slopes::lisbon_road_segments
-DATA$slope = slope_raster(DATA, dem = dem_lisbon_raster)
-DATA$slope = 100*DATA$slope
+DATA = slopes::lisbon_road_network
+DATA$slope_directed = slope_raster(DATA, dem = dem_lisbon_raster, directed = TRUE) # negative is downhill
+DATA$slope = 100*abs(DATA$slope_directed)
 DATA$slope_class = DATA$slope %>% 
   cut(
     breaks = c(0, 3, 5, 8, 10, 20, Inf),
@@ -279,12 +284,11 @@ tm_shape(DATA) +
 
 For the purpose of the example, we will assign a direction of the gradient, once that it was not defined.
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 #assign a direction of slope, for the purpose of the example
 DATA$direction = "FT" #From-To
-DATA$direction[(DATA$z0 - DATA$z1) < 0] = "TF" #To-From
+DATA$direction[DATA$slope_directed < 0] = "TF" #To-From
 
-mapviewOptions(fgb = FALSE)
 mapview::mapview(DATA["direction"],  selfcontained=TRUE)
 ```
 
@@ -292,19 +296,38 @@ And now compute the length, slope, and the speed-slope factor for each segment. 
 
 ```{r}
 #length and slope
-DATA$length = st_length(DATA)
+DATA$length = st_length(DATA) |> units::drop_units() #in meters
 DATA$slope[DATA$direction == "TF"] = -(DATA$slope[DATA$direction == "TF"])
 slope = DATA$slope
-length = units::drop_units(DATA$length)
+length = DATA$length
 
 #speed-slope factor
 g = g(slope, length)
 spf = speedfactor(slope, length, g)
 ```
 
-```{r echo=FALSE}
-plot(spf, log="y")
-abline(h = 1, lty = 3)
+```{r echo=FALSE, warning=FALSE}
+curve(
+  expr = speedfactor(slope = x, g = 7, length = 120),
+  from = -35, to = 30, col = "blue", lwd = 1, log = "y",
+  xlab = "slope [%]", ylab = "slope factor")
+curve(
+  expr = speedfactor(slope = x, g = 4, length = 120),
+  from = 10, to = 30, col = "purple", lwd = 1, lty = 5, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 4.5, length = 120),
+  from = 8, to = 30, col = "grey", lwd = 1, lty = 4, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 5, length = 120),
+  from = 5, to = 30, col = "orange", lwd = 1, lty = 3, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 6, length = 120),
+  from = 3, to = 30, col = "red", lwd = 1, lty = 2, log = "y", add = T)
+curve(
+  expr = speedfactor(slope = x, g = 7, length = 120),
+  from = -35, to = 30, col = "blue", lwd = 1, log = "y", add = T)
+abline(h = 1, v = 0, lty = 3)
+points(slope, spf, log="y", add = T) #from the results
 ```
 
 By defining a flat speed of `16 km/h`, it results in segments that are cycled up to 6 minutes uphill, and at a maximum speed of 53 km/h.
@@ -317,18 +340,20 @@ DATA$speedfactor = spf
 DATA$speed = speedflat / DATA$speedfactor
 DATA$time = length / DATA$speed*3.6
 
-mapview::mapview(DATA["speed"])
+mapview::mapview(DATA, zcol = "speed")
 summary(DATA$speed)
-mapview::mapview(DATA["time"])
+mapview::mapview(DATA, zcol = "time")
 summary(DATA$time)
 ```
 
-> It would be interesting to see also the length on pop map.
-
-This is a work in progress. **Suggestions and comments are welcome**! :) [github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor](https://github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor)
+This is a work in progress. **Suggestions and comments are welcome**! :)
+[github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor](https://github.com/U-Shift/Declives-RedeViaria/tree/main/SpeedSlopeFactor)
 
 # Conclusion
 
-Plausible?
+For a hilly city, the slope factor is a good approach to model the cost of the cyclist effort in a routing algorithm. It is a non-linear and non-monotonic function that reproduces the essential characteristics of the slope/effort relationship, and it is a good proxy for cyclist effort. It is also a good approach to model the cyclist speed in a road network.  
+Further research is needed to validate this approach, and to understand how it can be applied to different types of cyclists, and to different types of bicycles, as this method does not consider the effort on an e-bike. 
+
+Plausible? Let's discuss it!
 
 # References
